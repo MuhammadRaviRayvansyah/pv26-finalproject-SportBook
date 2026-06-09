@@ -1,0 +1,89 @@
+/* Styling untuk Card Container */
+#authCard, #loginCard {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    border: none;
+}
+
+/* Typography Header */
+#titleLabel {
+    font-size: 26px;
+    font-weight: bold;
+    color: #000000;
+    font-family: "Segoe UI", "Inter", sans-serif;
+    margin-bottom: 5px;
+}
+
+#subtitleLabel {
+    font-size: 14px;
+    color: #71717A;
+    font-family: "Segoe UI", "Inter", sans-serif;
+}
+
+/* Form Label */
+#fieldLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000000;
+    font-family: "Segoe UI", "Inter", sans-serif;
+}
+
+/* Form Input Field */
+QLineEdit {
+    border: 1.5px solid #D4D4D8;
+    border-radius: 10px;
+    padding: 0px 15px;
+    font-size: 14px;
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+QLineEdit:focus {
+    border: 1.5px solid #22C55E;
+}
+
+QLineEdit::placeholder {
+    color: #A1A1AA;
+    font-weight: bold;
+}
+
+/* Button Submit (Masuk / Daftar) */
+#btnSubmit, #btnMasuk {
+    background-color: #22C55E;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    border: none;
+    font-family: "Segoe UI", "Inter", sans-serif;
+}
+
+#btnSubmit:hover, #btnMasuk:hover {
+    background-color: #16A34A;
+}
+
+#btnSubmit:pressed, #btnMasuk:pressed {
+    background-color: #15803D;
+}
+
+/* Footer Section */
+#footerText {
+    color: #71717A;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#footerLink {
+    background: transparent;
+    border: none;
+    color: #22C55E;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+}
+
+#footerLink:hover {
+    color: #16A34A;
+    text-decoration: underline;
+}
