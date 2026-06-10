@@ -87,3 +87,154 @@ QLineEdit::placeholder {
     color: #16A34A;
     text-decoration: underline;
 }
+
+/* --- Penambahan Warna Background F5F5F5 --- */
+#homePage, #contentScroll, #scrollContent {
+    background-color: #F5F5F5;
+}
+
+#topNav, #botNav {
+    background-color: #FFFFFF;
+}
+
+/* Beranda Styles */
+#topNav {
+    background-color: white;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+#userName {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Background image dihapus karena sudah di-handle oleh PaintEvent pada HeroFrame */
+#heroSection {
+    border-radius: 24px;
+}
+
+#heroTitle { 
+    color: white; 
+    font-size: 28px; 
+    font-family: "Segoe UI", sans-serif;
+}
+
+#heroSub { 
+    color: white; 
+    font-size: 18px; 
+    font-weight: 600; 
+    font-family: "Segoe UI", sans-serif;
+}
+
+#heroSubSmall { 
+    color: white; 
+    font-size: 14px;
+    font-weight: normal;
+    font-family: "Segoe UI", sans-serif;
+    margin-bottom: 5px;
+}
+
+/* Badge Lokasi dengan Hover */
+#locBadge {
+    background-color: #22C55E;
+    color: white;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: bold;
+    border: none;
+    padding: 5px 10px;
+    font-family: "Segoe UI", sans-serif;
+}
+
+#locBadge:hover {
+    background-color: #16A34A;
+}
+
+/* Tombol Booking Shape 1 dengan Hover */
+#btnHero {
+    background-color: white;
+    color: #22C55E;
+    border-radius: 21px;
+    font-weight: bold;
+    font-size: 14px;
+    border: none;
+    font-family: "Segoe UI", sans-serif;
+}
+
+#btnHero:hover {
+    background-color: #F0FDF4;
+    color: #16A34A;
+}
+
+/* Card Lapangan Styles */
+#fieldCard {
+    background-color: white;
+    border-radius: 20px;
+    border: none;
+}
+
+#cardTitle {
+    font-size: 22px;
+    font-weight: bold;
+    color: #111827;
+    font-family: "Segoe UI", sans-serif;
+    margin: 0px;
+    padding: 0px;
+}
+
+#cardDesc {
+    font-size: 14px;
+    font-family: "Segoe UI", sans-serif;
+    margin: 0px;
+    padding: 0px;
+}
+
+#cardPrice {
+    font-size: 18px;
+    font-weight: bold;
+    color: #22C55E;
+    font-family: "Segoe UI", sans-serif;
+    margin: 0px;
+    padding: 0px;
+}
+
+/* Tombol Booking Shape 2,3,4 dengan Hover */
+#btnCardAction {
+    background-color: #BBF7D0;
+    color: #16A34A;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 14px;
+    border: none;
+    font-family: "Segoe UI", sans-serif;
+}
+
+#btnCardAction:hover {
+    background-color: #86EFAC;
+    color: #15803D;
+}
+
+/* Bottom Nav dengan Hover */
+#botNav {
+    background-color: white;
+    border-top: none;
+}
+
+#btnNav, #btnNavActive {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: "Segoe UI", sans-serif;
+}
+
+#btnNav:hover, #btnNavActive:hover {
+    background-color: #F3F4F6;
+}
+
+QToolButton {
+    icon-size: 28px;
+}
