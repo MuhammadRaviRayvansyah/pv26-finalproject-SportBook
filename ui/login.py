@@ -1,9 +1,10 @@
 import os
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QLineEdit, QPushButton, QFrame, QGraphicsDropShadowEffect,
-                             QSizePolicy)
-from PySide6.QtCore import Qt
+                             QSizePolicy, QMessageBox)
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QColor, QPainter
+from database.db_manager import validate_login
 
 # Mendapatkan direktori root proyek secara absolut
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,6 +36,8 @@ class BackgroundFrame(QFrame):
 
 
 class MainWindow(QWidget):
+    login_successful = Signal(str)
+
     def __init__(self):
         super().__init__()
         self.setup_window()
@@ -142,6 +145,8 @@ class MainWindow(QWidget):
         self.btn_masuk.setFixedHeight(50)
         self.btn_masuk.setCursor(Qt.PointingHandCursor)
         self.card_layout.addWidget(self.btn_masuk)
+        # Hubungkan tombol masuk ke fungsi proses_login
+        self.btn_masuk.clicked.connect(self.proses_login)
 
         # 6. Footer Text
         self.footer_layout = QHBoxLayout()
@@ -161,3 +166,27 @@ class MainWindow(QWidget):
         # Pasang Card ke Background
         self.bg_layout.addWidget(self.login_card)
         self.main_layout.addWidget(self.bg_frame)
+
+    # --- FUNGSI LOGIKA DATABASE ---
+    def proses_login(self):
+        email = self.email_input.text().strip()
+        password = self.pass_input.text().strip()
+
+        if not email or not password:
+            QMessageBox.warning(self, "Peringatan", "Email dan Password tidak boleh kosong!")
+            return
+
+        # Memanggil fungsi validasi dari db_manager
+        user_data = validate_login(email, password)
+
+        if user_data:
+            nama_user = user_data[0]
+            role_user = user_data[1] # Bisa digunakan nanti jika butuh routing ke Dashboard Admin
+            
+            self.email_input.clear()
+            self.pass_input.clear()
+            
+            # Emit signal dengan membawa nama user
+            self.login_successful.emit(nama_user)
+        else:
+            QMessageBox.critical(self, "Gagal", "Email atau Password salah!")

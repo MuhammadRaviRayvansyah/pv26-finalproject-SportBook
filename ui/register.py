@@ -1,10 +1,10 @@
 import os
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QLineEdit, QPushButton, QFrame, QGraphicsDropShadowEffect,
-                             QSizePolicy)
-from PySide6.QtCore import Qt
+                             QSizePolicy, QMessageBox)
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QColor, QPainter
-
+from database.db_manager import register_user
 # Mendapatkan path absolut root project
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -26,6 +26,8 @@ class BackgroundFrame(QFrame):
             painter.fillRect(self.rect(), QColor("#1a1a1a"))
 
 class RegisterPage(QWidget):
+    register_successful = Signal()
+
     def __init__(self):
         super().__init__()
         self.setup_window()
@@ -135,6 +137,8 @@ class RegisterPage(QWidget):
         self.btn_submit.setFixedHeight(48)
         self.btn_submit.setCursor(Qt.PointingHandCursor)
         self.card_layout.addWidget(self.btn_submit)
+        # Hubungkan tombol daftar ke fungsi proses_pendaftaran
+        self.btn_submit.clicked.connect(self.proses_pendaftaran)
 
         # Footer
         footer_box = QHBoxLayout()
@@ -152,3 +156,26 @@ class RegisterPage(QWidget):
 
         self.bg_layout.addWidget(self.register_card)
         self.main_layout.addWidget(self.bg_frame)
+
+    # --- FUNGSI LOGIKA DATABASE ---
+    def proses_pendaftaran(self):
+        nama = self.nama_input.text().strip()
+        email = self.email_input.text().strip()
+        password = self.pass_input.text().strip()
+
+        # Validasi Kosong
+        if not nama or not email or not password:
+            QMessageBox.warning(self, "Peringatan", "Semua kolom wajib diisi!")
+            return
+
+        # Memanggil fungsi dari db_manager
+        sukses, pesan = register_user(nama, email, password)
+
+        if sukses:
+            QMessageBox.information(self, "Berhasil", pesan)
+            self.nama_input.clear()
+            self.email_input.clear()
+            self.pass_input.clear()
+            self.register_successful.emit()
+        else:
+            QMessageBox.critical(self, "Gagal", pesan)

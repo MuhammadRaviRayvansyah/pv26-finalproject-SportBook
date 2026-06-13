@@ -238,3 +238,125 @@ QLineEdit::placeholder {
 QToolButton {
     icon-size: 28px;
 }
+
+/* --- Penambahan Style Khusus Booking Page --- */
+
+#topTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: #111827;
+    font-family: "Segoe UI", "Inter", sans-serif;
+}
+
+#btnBack {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #111827;
+    padding: 0px 10px;
+    font-family: "Segoe UI", sans-serif;
+}
+
+#btnBack:hover {
+    color: #22C55E;
+}
+
+/* Styling untuk Judul Section (List Lapangan) */
+#sectionTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: #111827;
+    font-family: "Segoe UI", "Inter", sans-serif;
+    margin-top: 10px;
+    padding-bottom: 5px;
+}
+
+/* --- DETAIL BOOKING STYLES --- */
+#detailCard {
+    background-color: white;
+    border-radius: 20px;
+    border: none;
+}
+
+#detailNama {
+    font-size: 26px;
+    font-weight: bold;
+    color: #111827;
+    font-family: "Segoe UI", sans-serif;
+    margin-top: 5px;
+}
+
+#detailTextBold {
+    font-size: 14px;
+    font-weight: bold;
+    color: #111827;
+    font-family: "Segoe UI", sans-serif;
+}
+
+#detailTextGreen {
+    font-size: 14px;
+    font-weight: bold;
+    color: #26BF6C;
+    font-family: "Segoe UI", sans-serif;
+    margin-left: 10px;
+}
+
+#detailHarga {
+    font-size: 28px;
+    font-weight: bold;
+    color: #26BF6C;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Tombol Jadwal (Grid) dengan 3 Status */
+#slotBtn {
+    border: none;
+    font-size: 13px;
+    font-family: "Segoe UI", sans-serif;
+}
+
+#slotBtn[state="available"] {
+    background-color: #00FF74;
+    color: #111827;
+    border-radius: 17px;
+    font-weight: bold;
+}
+
+#slotBtn[state="selected"] {
+    background-color: #26BF6C;
+    color: white;
+    border-radius: 17px;
+    font-weight: bold;
+}
+
+#slotBtn[state="booked"] {
+    background-color: #F5F5F5;
+    color: #A1A1AA;
+    border-radius: 17px;
+    font-weight: bold;
+}
+
+#durasiBadge {
+    color: #26BF6C;
+    border: 1.5px solid #26BF6C;
+    border-radius: 14px;
+    padding: 4px 15px;
+    font-weight: bold;
+    font-size: 14px;
+    font-family: "Segoe UI", sans-serif;
+}
+
+#btnSubmitGreen {
+    background-color: #26BF6C;
+    color: white;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 16px;
+    font-family: "Segoe UI", sans-serif;
+    border: none;
+}
+
+#btnSubmitGreen:hover {
+    background-color: #20A35B;
+}

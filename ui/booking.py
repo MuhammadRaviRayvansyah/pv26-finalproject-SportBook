@@ -2,14 +2,13 @@ import os
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QFrame, QScrollArea, QSizePolicy, 
                              QGraphicsDropShadowEffect, QToolButton)
-from PySide6.QtCore import Qt, QSize, Signal
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
 
 # Mendapatkan path absolut root project
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def create_colored_icon(icon_path, color, size=28):
-    """Membuat icon dengan warna tertentu"""
     pixmap = QPixmap(icon_path)
     if not pixmap.isNull():
         pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
@@ -25,37 +24,6 @@ def create_colored_icon(icon_path, color, size=28):
         
         return QIcon(colored_pixmap)
     return QIcon()
-
-class HeroFrame(QFrame):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setObjectName("heroSection")
-        self.setFixedHeight(320)
-        self.bg_path = os.path.join(BASE_DIR, "assets", "images", "stadium_bg.jpg")
-        self.pixmap = QPixmap(self.bg_path)
-        
-        shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(20)
-        shadow.setXOffset(0)
-        shadow.setYOffset(6)
-        shadow.setColor(QColor(0, 0, 0, 45))
-        self.setGraphicsEffect(shadow)
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        if not self.pixmap.isNull():
-            scaled = self.pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
-            path = QPainterPath()
-            path.addRoundedRect(0, 0, self.width(), self.height(), 24, 24)
-            painter.setClipPath(path)
-            
-            x = (self.width() - scaled.width()) // 2
-            y = (self.height() - scaled.height()) // 2
-            painter.drawPixmap(x, y, scaled)
-        else:
-            painter.setBrush(QColor("#e5e7eb"))
-            painter.drawRoundedRect(0, 0, self.width(), self.height(), 24, 24)
 
 class CardImage(QWidget):
     def __init__(self, img_path, parent=None):
@@ -120,6 +88,7 @@ class FieldCard(QFrame):
         loc_layout.setSpacing(8)
         loc_icon = QLabel()
         icon_loc_path = os.path.join(BASE_DIR, "assets", "icons", "location.svg")
+        # Ruang bounding box ditingkatkan menjadi 20x20 dan dipusatkan agar tidak terpotong
         loc_icon.setPixmap(create_colored_icon(icon_loc_path, QColor("#111827"), 18).pixmap(20, 20))
         loc_icon.setFixedSize(20, 20)
         loc_icon.setAlignment(Qt.AlignCenter)
@@ -179,7 +148,7 @@ class FieldCard(QFrame):
 
         main_layout.addLayout(info_layout)
 
-        # --- DESKRIPSI HARGA & TOMBOL ---
+        # --- DESKRIPSI HARGA & TOMBOL DIBAWAH DIPERTAHANKAN ---
         bottom_layout = QHBoxLayout()
         bottom_layout.setContentsMargins(0, 0, 0, 0)
         bottom_layout.setSpacing(0)
@@ -211,7 +180,7 @@ class FieldCard(QFrame):
         main_layout.addLayout(bottom_layout)
 
 
-class HomePage(QWidget):
+class BookingPage(QWidget):
     request_book = Signal(str, str, int)
 
     def __init__(self):
@@ -230,20 +199,29 @@ class HomePage(QWidget):
         self.top_nav.setFixedHeight(65)
         
         shadow_top = QGraphicsDropShadowEffect(self)
-        shadow_top.setBlurRadius(15)
+        shadow_top.setBlurRadius(20)
         shadow_top.setXOffset(0)
         shadow_top.setYOffset(4)
-        shadow_top.setColor(QColor(0, 0, 0, 20))
+        shadow_top.setColor(QColor(0, 0, 0, 45))
         self.top_nav.setGraphicsEffect(shadow_top)
 
         top_layout = QHBoxLayout(self.top_nav)
         top_layout.setContentsMargins(25, 0, 25, 0)
 
-        self.logo = QLabel()
-        pix_logo = QPixmap(os.path.join(BASE_DIR, "assets", "logos", "sportbook_logo.png"))
-        if not pix_logo.isNull():
-            self.logo.setPixmap(pix_logo.scaled(130, 45, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.btn_back = QPushButton("<")
+        self.btn_back.setObjectName("btnBack")
+        self.btn_back.setCursor(Qt.PointingHandCursor)
         
+        left_container = QWidget()
+        left_layout = QHBoxLayout(left_container)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+        left_layout.addWidget(self.btn_back)
+        left_layout.addStretch()
+
+        self.title_top = QLabel("Booking Lapangan")
+        self.title_top.setObjectName("topTitle")
+        self.title_top.setAlignment(Qt.AlignCenter)
+
         user_layout = QHBoxLayout()
         user_layout.setSpacing(12)
         self.user_name = QLabel("Ravi")
@@ -255,7 +233,6 @@ class HomePage(QWidget):
         if not user_pixmap.isNull():
             self.icon_user.setPixmap(user_pixmap.scaled(22, 22, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.icon_user.setFixedSize(22, 22)
-        self.icon_user.setCursor(Qt.PointingHandCursor)
 
         self.icon_notif = QLabel()
         notif_icon_path = os.path.join(BASE_DIR, "assets", "icons", "bell.svg")
@@ -263,15 +240,20 @@ class HomePage(QWidget):
         if not notif_pixmap.isNull():
             self.icon_notif.setPixmap(notif_pixmap.scaled(22, 22, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.icon_notif.setFixedSize(22, 22)
-        self.icon_notif.setCursor(Qt.PointingHandCursor)
 
         user_layout.addWidget(self.user_name)
         user_layout.addWidget(self.icon_user)
         user_layout.addWidget(self.icon_notif)
 
-        top_layout.addWidget(self.logo)
-        top_layout.addStretch()
-        top_layout.addLayout(user_layout)
+        right_container = QWidget()
+        right_layout = QHBoxLayout(right_container)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.addStretch()
+        right_layout.addLayout(user_layout)
+
+        top_layout.addWidget(left_container, 1)
+        top_layout.addWidget(self.title_top, 2)
+        top_layout.addWidget(right_container, 1)
 
         # --- SCROLL AREA ---
         self.scroll = QScrollArea()
@@ -287,58 +269,12 @@ class HomePage(QWidget):
         self.scroll_layout.setContentsMargins(0, 0, 0, 0)
         self.scroll_layout.setSpacing(0)
 
-        # --- KONTEN (HERO + FIELD CARDS) ---
+        # --- KONTEN UTAMA ---
         content_widget = QWidget()
         content_layout = QVBoxLayout(content_widget)
         content_layout.setContentsMargins(25, 25, 25, 25)
         content_layout.setSpacing(25)
-
-        self.hero = HeroFrame()
-        hero_layout = QVBoxLayout(self.hero)
-        hero_layout.setContentsMargins(35, 30, 35, 30)
-        hero_layout.setSpacing(12)
         
-        self.h_title = QLabel("Hallo, <b style='color:#22C55E;'>Pengguna!</b>")
-        self.h_title.setObjectName("heroTitle")
-
-        self.h_sub1 = QLabel("Booking futsal hari ini?")
-        self.h_sub1.setObjectName("heroSub")
-        self.h_sub1.setContentsMargins(0, 5, 0, 0)
-
-        self.h_sub2 = QLabel("Terdapat pilihan lapangan dan jam booking")
-        self.h_sub2.setObjectName("heroSub")
-        self.h_sub2.setContentsMargins(0, 0, 0, 10)
-        
-        self.loc_badge = QPushButton(" Lokasi: Mataram, Jalan xxxx")
-        self.loc_badge.setObjectName("locBadge")
-        self.loc_badge.setFixedSize(220, 42)
-        self.loc_badge.setCursor(Qt.PointingHandCursor)
-        self.loc_badge.setContentsMargins(0, 5, 0, 5)
-        
-        icon_loc_path = os.path.join(BASE_DIR, "assets", "icons", "location.svg")
-        self.loc_badge.setIcon(create_colored_icon(icon_loc_path, QColor(255, 255, 255), 18))
-        self.loc_badge.setIconSize(QSize(18, 18))
-        
-        self.btn_hero = QPushButton("Booking Sekarang")
-        self.btn_hero.setObjectName("btnHero")
-        self.btn_hero.setFixedSize(220, 42)
-        self.btn_hero.setCursor(Qt.PointingHandCursor)
-        self.btn_hero.setContentsMargins(0, 10, 0, 0)
-
-        hero_layout.addWidget(self.h_title)
-        hero_layout.addWidget(self.h_sub1)
-        hero_layout.addWidget(self.h_sub2)
-        hero_layout.addStretch() # Dipindah ke SINI agar tombol lokasi terdorong ke bawah!
-        hero_layout.addWidget(self.loc_badge)
-        hero_layout.addWidget(self.btn_hero)
-        
-        content_layout.addWidget(self.hero)
-        
-        self.list_title = QLabel("List Lapangan")
-        self.list_title.setObjectName("sectionTitle")
-        self.list_title.setAlignment(Qt.AlignCenter)
-        content_layout.addWidget(self.list_title)
-
         card1 = FieldCard("lapangan_1.jpg", "Lapangan 1", "200.000")
         card1.request_book.connect(self.request_book.emit)
         content_layout.addWidget(card1)
@@ -353,17 +289,17 @@ class HomePage(QWidget):
 
         self.scroll_layout.addWidget(content_widget)
         self.scroll.setWidget(self.scroll_content)
-
+        
         # --- BOTTOM NAVBAR ---
         self.bot_nav = QFrame()
         self.bot_nav.setObjectName("botNav")
         self.bot_nav.setFixedHeight(75)
 
         shadow_bot = QGraphicsDropShadowEffect(self)
-        shadow_bot.setBlurRadius(15)
+        shadow_bot.setBlurRadius(20)
         shadow_bot.setXOffset(0)
         shadow_bot.setYOffset(-4)
-        shadow_bot.setColor(QColor(0, 0, 0, 20))
+        shadow_bot.setColor(QColor(0, 0, 0, 45))
         self.bot_nav.setGraphicsEffect(shadow_bot)
 
         bot_layout = QHBoxLayout(self.bot_nav)
@@ -376,20 +312,20 @@ class HomePage(QWidget):
         icon_gear = os.path.join(BASE_DIR, "assets", "icons", "gear.svg")
 
         self.btn_home = QToolButton()
-        self.btn_home.setIcon(create_colored_icon(icon_home, QColor(34, 197, 94), 28))
+        self.btn_home.setIcon(create_colored_icon(icon_home, QColor(113, 113, 122), 28))
         self.btn_home.setText("Beranda")
         self.btn_home.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.btn_home.setObjectName("btnNavActive")
+        self.btn_home.setObjectName("btnNav")
         self.btn_home.setCursor(Qt.PointingHandCursor)
-        self.btn_home.setStyleSheet("color: #22C55E;")
+        self.btn_home.setStyleSheet("color: #71717A;")
 
         self.btn_booking = QToolButton()
-        self.btn_booking.setIcon(create_colored_icon(icon_schedule, QColor(113, 113, 122), 28))
+        self.btn_booking.setIcon(create_colored_icon(icon_schedule, QColor(34, 197, 94), 28))
         self.btn_booking.setText("Booking")
         self.btn_booking.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.btn_booking.setObjectName("btnNav")
+        self.btn_booking.setObjectName("btnNavActive")
         self.btn_booking.setCursor(Qt.PointingHandCursor)
-        self.btn_booking.setStyleSheet("color: #71717A;")
+        self.btn_booking.setStyleSheet("color: #22C55E;")
 
         self.btn_hist = QToolButton()
         self.btn_hist.setIcon(create_colored_icon(icon_history, QColor(113, 113, 122), 28))
@@ -418,6 +354,3 @@ class HomePage(QWidget):
 
         self.top_nav.raise_()
         self.bot_nav.raise_()
-
-        # Koneksikan klik btn_hero di Hero Section agar memicu event klik pada Navbar btn_booking
-        self.btn_hero.clicked.connect(self.btn_booking.click)
