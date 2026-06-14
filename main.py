@@ -1,15 +1,22 @@
 import sys
 import os
 from PySide6.QtWidgets import QApplication, QStackedWidget, QMessageBox
+from PySide6.QtCore import Qt
 
+# Import Semua Halaman UI
 from ui.login import MainWindow as LoginPage
 from ui.register import RegisterPage
 from ui.beranda import HomePage
 from ui.booking import BookingPage
-from ui.detail_booking import DetailBookingPage # Import UI Baru
+from ui.detail_booking import DetailBookingPage
+from ui.pembayaran import PembayaranPage
+from ui.notif_sukses import NotifSuksesPage
+from ui.history import HistoryPage 
+from ui.pengaturan import PengaturanPage 
 
-# Import database
-from database.db_manager import init_db, get_booked_slots, save_booking
+# Import Fungsi Database (Pastikan update_user_profile ditambahkan ke sini)
+from database.db_manager import (init_db, get_booked_slots, save_booking, 
+                                   get_user_bookings, delete_user_booking, update_user_profile)
 
 def load_stylesheet(app, file_path):
     if os.path.exists(file_path):
@@ -25,89 +32,212 @@ if __name__ == "__main__":
     
     stacked_widget = QStackedWidget()
     
-    # Instance Halaman
     login_page = LoginPage()
     register_page = RegisterPage()
     home_page = HomePage()
     booking_page = BookingPage()
-    detail_page = DetailBookingPage() # Instance Baru
+    detail_page = DetailBookingPage()
+    pembayaran_page = PembayaranPage()
+    sukses_page = NotifSuksesPage()
+    history_page = HistoryPage()  
+    pengaturan_page = PengaturanPage() 
     
     stacked_widget.addWidget(login_page)
     stacked_widget.addWidget(register_page)
     stacked_widget.addWidget(home_page)
     stacked_widget.addWidget(booking_page)
     stacked_widget.addWidget(detail_page)
+    stacked_widget.addWidget(pembayaran_page)
+    stacked_widget.addWidget(sukses_page)
+    stacked_widget.addWidget(history_page)  
+    stacked_widget.addWidget(pengaturan_page)  
     
-    # Variabel Sesi untuk menyimpan user yang sedang login
-    current_session = {"nama": ""}
+    current_session = {
+        "nama": "",
+        "temp_lapangan": "",
+        "temp_slots": [],
+        "temp_harga": 0
+    }
     
-    # --- FUNGSI NAVIGASI ---
+    # --- FUNGSI-FUNGSI NAVIGASI HALAMAN ---
     def buka_halaman_register():
         stacked_widget.setCurrentWidget(register_page)
+        stacked_widget.setWindowTitle("SportBook - Register")
         
     def buka_halaman_login():
         stacked_widget.setCurrentWidget(login_page)
+        stacked_widget.setWindowTitle("SportBook - Login")
         
     def buka_halaman_beranda():
         stacked_widget.setCurrentWidget(home_page)
-        home_page.scroll.verticalScrollBar().setValue(0)
+        stacked_widget.setWindowTitle("SportBook - Beranda")
+        try: home_page.scroll.verticalScrollBar().setValue(0)
+        except AttributeError: pass
 
     def buka_halaman_booking():
         stacked_widget.setCurrentWidget(booking_page)
-        booking_page.scroll.verticalScrollBar().setValue(0)
+        stacked_widget.setWindowTitle("SportBook - Booking")
+        try: booking_page.scroll.verticalScrollBar().setValue(0)
+        except AttributeError: pass
+            
+    def buka_halaman_history():
+        user_aktif = current_session["nama"]
+        data_history = get_user_bookings(user_aktif)
         
+        history_page.user_name.setText(user_aktif)
+        history_page.load_history(data_history)
+        
+        stacked_widget.setCurrentWidget(history_page)
+        stacked_widget.setWindowTitle("SportBook - Riwayat")
+        try: history_page.scroll.verticalScrollBar().setValue(0)
+        except AttributeError: pass
+
+    def buka_halaman_pengaturan(*args):
+        # Reset form saat masuk (tidak menyimpan sisa ketikan yang dibatalkan)
+        pengaturan_page.inp_nama.clear()
+        pengaturan_page.inp_pass.clear()
+        pengaturan_page.inp_conf_pass.clear()
+        
+        stacked_widget.setCurrentWidget(pengaturan_page)
+        stacked_widget.setWindowTitle("SportBook - Pengaturan Akun")
+        try: pengaturan_page.scroll.verticalScrollBar().setValue(0)
+        except AttributeError: pass
+        
+    # --- FUNGSI LOGIKA DAN TRANSAKSI ---
+
+    def proses_logout():
+        """Menghapus sesi pengguna dan mengalihkan ke form login"""
+        current_session["nama"] = ""
+        current_session["temp_lapangan"] = ""
+        current_session["temp_slots"] = []
+        buka_halaman_login()
+
+    def simpan_pengaturan(nama_baru, pwd, conf_pwd):
+        """Memvalidasi dan memperbarui data akun ke dalam database"""
+        # 1. Validasi Password
+        if pwd != "" or conf_pwd != "":
+            if pwd != conf_pwd:
+                QMessageBox.warning(pengaturan_page, "Peringatan", "Konfirmasi Kata Sandi tidak cocok!")
+                return
+        
+        old_nama = current_session["nama"]
+        final_nama = nama_baru.strip() if nama_baru.strip() != "" else old_nama
+
+        # 2. Proses ke Database
+        update_user_profile(old_nama, final_nama, pwd)
+        
+        # 3. Update Sesi Saat Ini
+        current_session["nama"] = final_nama
+        
+        # 4. Terapkan Nama Baru Secara Keseluruhan pada UI
+        home_page.user_name.setText(final_nama)
+        home_page.h_title.setText(f"Hallo, <b style='color:#22C55E;'>{final_nama}!</b>")
+        booking_page.user_name.setText(final_nama)
+        history_page.user_name.setText(final_nama)
+        
+        QMessageBox.information(pengaturan_page, "Sukses", "Perubahan profil berhasil disimpan secara permanen!")
+        
+        # Kembali ke beranda setelah berhasil menyimpan
+        buka_halaman_beranda()
+
+    def hapus_riwayat(lapangan_nama):
+        user_aktif = current_session["nama"]
+        delete_user_booking(user_aktif, lapangan_nama)
+        buka_halaman_history()
+
     def saat_login_berhasil(nama_user):
-        current_session["nama"] = nama_user # Simpan sesi
+        current_session["nama"] = nama_user 
         home_page.user_name.setText(nama_user)
         home_page.h_title.setText(f"Hallo, <b style='color:#22C55E;'>{nama_user}!</b>")
         booking_page.user_name.setText(nama_user)
         buka_halaman_beranda()
 
     def buka_detail_lapangan(nama, img_name, harga):
-        """Dipanggil saat tombol 'Booking Lapangan' pada Card ditekan."""
-        # Ambil data jam yang sudah dibooking dari SQLite
         booked = get_booked_slots(nama)
-        # Muat data UI
         detail_page.load_data(nama, img_name, harga, booked)
-        
         stacked_widget.setCurrentWidget(detail_page)
-        detail_page.scroll.verticalScrollBar().setValue(0)
+        stacked_widget.setWindowTitle(f"SportBook - {nama}")
 
-    def proses_checkout_sementara(lapangan_nama, list_jam, total_harga):
-        """Dipanggil saat menekan 'Berikutnya' di halaman Detail."""
+    def lanjut_ke_pembayaran(lapangan_nama, list_jam, total_harga):
+        current_session["temp_lapangan"] = lapangan_nama
+        current_session["temp_slots"] = list_jam
+        current_session["temp_harga"] = total_harga
+        
+        jumlah_jam = len(list_jam)
+        pembayaran_page.load_data(jumlah_jam, total_harga)
+        stacked_widget.setCurrentWidget(pembayaran_page)
+        stacked_widget.setWindowTitle("SportBook - Pembayaran")
+
+    def proses_pembayaran_final(metode):
         user_aktif = current_session["nama"]
+        lapangan = current_session["temp_lapangan"]
+        slots = current_session["temp_slots"]
         
-        # Simpan ke Database
-        sukses = save_booking(user_aktif, lapangan_nama, list_jam)
-        
+        sukses = save_booking(user_aktif, lapangan, slots)
         if sukses:
-            jam_str = "\n".join(list_jam)
-            QMessageBox.information(detail_page, "Sukses", 
-                f"Booking Berhasil Disimpan!\n\nLapangan: {lapangan_nama}\nTotal: Rp {total_harga:,.0f}\nJam:\n{jam_str}")
-            # Kembali ke beranda setelah sukses
-            buka_halaman_beranda()
+            current_session["temp_slots"] = []
+            stacked_widget.setCurrentWidget(sukses_page)
+            stacked_widget.setWindowTitle("SportBook - Transaksi Berhasil")
         else:
-            QMessageBox.critical(detail_page, "Error", "Gagal menyimpan jadwal ke database.")
+            QMessageBox.critical(pembayaran_page, "Error", "Gagal menyimpan jadwal ke database.")
     
-    # --- MENGHUBUNGKAN SIGNAL ---
+    # --- HUBUNGAN SIGNAL DAN SLOT (NAVIGASI & AKSI) ---
+    
+    # 1. Login & Register
     login_page.footer_link.clicked.connect(buka_halaman_register)
     register_page.f_link.clicked.connect(buka_halaman_login)
-    
     login_page.login_successful.connect(saat_login_berhasil)
     register_page.register_successful.connect(buka_halaman_login)
 
+    # 2. Bottom Navbar
     home_page.btn_booking.clicked.connect(buka_halaman_booking)
-    booking_page.btn_back.clicked.connect(buka_halaman_beranda)
-    booking_page.btn_home.clicked.connect(buka_halaman_beranda)
+    home_page.btn_hist.clicked.connect(buka_halaman_history)
+    home_page.btn_settings.clicked.connect(buka_halaman_pengaturan)
     
-    # Koneksi Signal dari Card ke fungsi buka_detail_lapangan
+    booking_page.btn_home.clicked.connect(buka_halaman_beranda)
+    booking_page.btn_hist.clicked.connect(buka_halaman_history)
+    booking_page.btn_settings.clicked.connect(buka_halaman_pengaturan)
+    booking_page.btn_back.clicked.connect(buka_halaman_beranda)
+    
+    history_page.btn_home.clicked.connect(buka_halaman_beranda)
+    history_page.btn_booking.clicked.connect(buka_halaman_booking)
+    history_page.btn_settings.clicked.connect(buka_halaman_pengaturan)
+    history_page.btn_back.clicked.connect(buka_halaman_beranda)
+
+    pengaturan_page.btn_home.clicked.connect(buka_halaman_beranda)
+    pengaturan_page.btn_booking.clicked.connect(buka_halaman_booking)
+    pengaturan_page.btn_hist.clicked.connect(buka_halaman_history)
+
+    # 3. Topbar: Jadikan Nama dan Icon User bisa diklik untuk masuk Pengaturan
+    def buat_label_bisa_diklik(label_widget):
+        label_widget.setCursor(Qt.PointingHandCursor)
+        label_widget.mousePressEvent = buka_halaman_pengaturan
+
+    buat_label_bisa_diklik(home_page.user_name)
+    buat_label_bisa_diklik(home_page.icon_user)
+    buat_label_bisa_diklik(booking_page.user_name)
+    buat_label_bisa_diklik(booking_page.icon_user)
+    buat_label_bisa_diklik(history_page.user_name)
+    buat_label_bisa_diklik(history_page.icon_user)
+
+    # 4. Aksi Pengaturan (Simpan / Logout)
+    pengaturan_page.save_clicked.connect(simpan_pengaturan)
+    pengaturan_page.logout_clicked.connect(proses_logout)
+
+    # 5. Aksi Hapus di History
+    history_page.request_delete.connect(hapus_riwayat)
+    
+    # 6. Alur Transaksi Booking Lapangan
     home_page.request_book.connect(buka_detail_lapangan)
     booking_page.request_book.connect(buka_detail_lapangan)
-    
-    # Koneksi Signal dari Detail Page
     detail_page.go_back.connect(buka_halaman_booking)
-    detail_page.proceed_checkout.connect(proses_checkout_sementara)
+    detail_page.proceed_checkout.connect(lanjut_ke_pembayaran)
+    pembayaran_page.go_back.connect(lambda: stacked_widget.setCurrentWidget(detail_page))
+    pembayaran_page.confirm_payment.connect(proses_pembayaran_final)
+    sukses_page.back_to_home.connect(buka_halaman_beranda)
     
+    # --- KONFIGURASI AWAL WINDOW ---
+    stacked_widget.setWindowTitle("SportBook")
     stacked_widget.setMinimumSize(800, 500)
     stacked_widget.resize(1000, 600)
     

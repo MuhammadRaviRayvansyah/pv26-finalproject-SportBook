@@ -360,3 +360,62 @@ QToolButton {
 #btnSubmitGreen:hover {
     background-color: #20A35B;
 }
+
+/* --- PEMBAYARAN STYLES --- */
+#paymentCard {
+    background-color: white;
+    border-radius: 15px;
+    border: none;
+}
+
+#paymentTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000000;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Memperbesar ukuran Radio Button agar menyerupai referensi UI */
+#paymentRadio::indicator {
+    width: 24px;
+    height: 24px;
+    border-radius: 13px;
+    border: 2px solid #111827;
+}
+
+#paymentRadio::indicator:checked {
+    background-color: #000000;
+    border: 6px solid white;
+    outline: 2px solid #000000; /* Efek cincin luar */
+}
+
+#summaryLabel {
+    font-size: 16px;
+    font-weight: bold;
+    color: #6B7280;
+    font-family: "Segoe UI", sans-serif;
+}
+
+#summaryTotal {
+    font-size: 26px;
+    font-weight: bold;
+    color: #26BF6C;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* --- NOTIFIKASI SUKSES STYLES --- */
+#notifTitle {
+    font-size: 32px;
+    font-weight: bold;
+    color: #000000;
+    line-height: 1.2;
+    font-family: "Segoe UI", sans-serif;
+}
+
+#notifDesc {
+    font-size: 18px;
+    font-weight: 500;
+    color: #000000;
+    line-height: 1.4;
+    font-family: "Segoe UI", sans-serif;
+}

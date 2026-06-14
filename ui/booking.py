@@ -5,7 +5,6 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
 
-# Mendapatkan path absolut root project
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def create_colored_icon(icon_path, color, size=28):
@@ -82,13 +81,11 @@ class FieldCard(QFrame):
         self.title_lbl.setContentsMargins(0, 0, 0, 0)
         info_layout.addWidget(self.title_lbl)
         
-        # --- ROW 1: Lokasi ---
         loc_layout = QHBoxLayout()
         loc_layout.setContentsMargins(0, 0, 0, 0)
         loc_layout.setSpacing(8)
         loc_icon = QLabel()
         icon_loc_path = os.path.join(BASE_DIR, "assets", "icons", "location.svg")
-        # Ruang bounding box ditingkatkan menjadi 20x20 dan dipusatkan agar tidak terpotong
         loc_icon.setPixmap(create_colored_icon(icon_loc_path, QColor("#111827"), 18).pixmap(20, 20))
         loc_icon.setFixedSize(20, 20)
         loc_icon.setAlignment(Qt.AlignCenter)
@@ -104,7 +101,6 @@ class FieldCard(QFrame):
         loc_layout.addStretch()
         info_layout.addLayout(loc_layout)
 
-        # --- ROW 2: Buka ---
         buka_layout = QHBoxLayout()
         buka_layout.setContentsMargins(0, 0, 0, 0)
         buka_layout.setSpacing(8)
@@ -125,7 +121,6 @@ class FieldCard(QFrame):
         buka_layout.addStretch()
         info_layout.addLayout(buka_layout)
 
-        # --- ROW 3: Jam ---
         jam_layout = QHBoxLayout()
         jam_layout.setContentsMargins(0, 0, 0, 0)
         jam_layout.setSpacing(8)
@@ -148,7 +143,6 @@ class FieldCard(QFrame):
 
         main_layout.addLayout(info_layout)
 
-        # --- DESKRIPSI HARGA & TOMBOL DIBAWAH DIPERTAHANKAN ---
         bottom_layout = QHBoxLayout()
         bottom_layout.setContentsMargins(0, 0, 0, 0)
         bottom_layout.setSpacing(0)
@@ -234,16 +228,10 @@ class BookingPage(QWidget):
             self.icon_user.setPixmap(user_pixmap.scaled(22, 22, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.icon_user.setFixedSize(22, 22)
 
-        self.icon_notif = QLabel()
-        notif_icon_path = os.path.join(BASE_DIR, "assets", "icons", "bell.svg")
-        notif_pixmap = QPixmap(notif_icon_path)
-        if not notif_pixmap.isNull():
-            self.icon_notif.setPixmap(notif_pixmap.scaled(22, 22, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        self.icon_notif.setFixedSize(22, 22)
+        # Ikon lonceng dihapus dari sini
 
         user_layout.addWidget(self.user_name)
         user_layout.addWidget(self.icon_user)
-        user_layout.addWidget(self.icon_notif)
 
         right_container = QWidget()
         right_layout = QHBoxLayout(right_container)
@@ -292,19 +280,20 @@ class BookingPage(QWidget):
         
         # --- BOTTOM NAVBAR ---
         self.bot_nav = QFrame()
-        self.bot_nav.setObjectName("botNav")
         self.bot_nav.setFixedHeight(75)
-
+        self.bot_nav.setAttribute(Qt.WA_StyledBackground, True)
+        self.bot_nav.setStyleSheet("background-color: white;")
+        
         shadow_bot = QGraphicsDropShadowEffect(self)
         shadow_bot.setBlurRadius(20)
         shadow_bot.setXOffset(0)
         shadow_bot.setYOffset(-4)
-        shadow_bot.setColor(QColor(0, 0, 0, 45))
+        shadow_bot.setColor(QColor(0, 0, 0, 20))
         self.bot_nav.setGraphicsEffect(shadow_bot)
 
         bot_layout = QHBoxLayout(self.bot_nav)
-        bot_layout.setContentsMargins(20, 5, 20, 5)
-        bot_layout.setSpacing(20)
+        bot_layout.setContentsMargins(0, 5, 0, 5) 
+        bot_layout.setSpacing(0) 
 
         icon_home = os.path.join(BASE_DIR, "assets", "icons", "home.svg")
         icon_schedule = os.path.join(BASE_DIR, "assets", "icons", "schedule.svg")
@@ -312,36 +301,37 @@ class BookingPage(QWidget):
         icon_gear = os.path.join(BASE_DIR, "assets", "icons", "gear.svg")
 
         self.btn_home = QToolButton()
-        self.btn_home.setIcon(create_colored_icon(icon_home, QColor(113, 113, 122), 28))
+        self.btn_home.setIcon(create_colored_icon(icon_home, QColor(113, 113, 122), 28)) 
         self.btn_home.setText("Beranda")
         self.btn_home.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.btn_home.setObjectName("btnNav")
         self.btn_home.setCursor(Qt.PointingHandCursor)
-        self.btn_home.setStyleSheet("color: #71717A;")
+        self.btn_home.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding) 
+        self.btn_home.setStyleSheet("color: #71717A; border: none; font-size: 13px; font-weight: bold;")
 
+        # AKTIF: HIJAU
         self.btn_booking = QToolButton()
-        self.btn_booking.setIcon(create_colored_icon(icon_schedule, QColor(34, 197, 94), 28))
+        self.btn_booking.setIcon(create_colored_icon(icon_schedule, QColor(34, 197, 94), 28)) 
         self.btn_booking.setText("Booking")
         self.btn_booking.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.btn_booking.setObjectName("btnNavActive")
         self.btn_booking.setCursor(Qt.PointingHandCursor)
-        self.btn_booking.setStyleSheet("color: #22C55E;")
+        self.btn_booking.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.btn_booking.setStyleSheet("color: #22C55E; border: none; font-size: 13px; font-weight: bold;")
 
         self.btn_hist = QToolButton()
-        self.btn_hist.setIcon(create_colored_icon(icon_history, QColor(113, 113, 122), 28))
+        self.btn_hist.setIcon(create_colored_icon(icon_history, QColor(113, 113, 122), 28)) 
         self.btn_hist.setText("Riwayat")
         self.btn_hist.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.btn_hist.setObjectName("btnNav")
         self.btn_hist.setCursor(Qt.PointingHandCursor)
-        self.btn_hist.setStyleSheet("color: #71717A;")
+        self.btn_hist.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.btn_hist.setStyleSheet("color: #71717A; border: none; font-size: 13px; font-weight: bold;")
 
         self.btn_settings = QToolButton()
-        self.btn_settings.setIcon(create_colored_icon(icon_gear, QColor(113, 113, 122), 28))
+        self.btn_settings.setIcon(create_colored_icon(icon_gear, QColor(113, 113, 122), 28)) 
         self.btn_settings.setText("Pengaturan")
         self.btn_settings.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.btn_settings.setObjectName("btnNav")
         self.btn_settings.setCursor(Qt.PointingHandCursor)
-        self.btn_settings.setStyleSheet("color: #71717A;")
+        self.btn_settings.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.btn_settings.setStyleSheet("color: #71717A; border: none; font-size: 13px; font-weight: bold;")
 
         bot_layout.addWidget(self.btn_home)
         bot_layout.addWidget(self.btn_booking)

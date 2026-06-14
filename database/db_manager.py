@@ -85,3 +85,40 @@ def save_booking(user_nama, lapangan_nama, list_jam):
         return False
     finally:
         conn.close()
+
+def get_user_bookings(user_nama):
+    """Mengambil semua riwayat booking milik user tertentu."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    # Kita ambil nama lapangan dan jamnya
+    cursor.execute("SELECT lapangan_nama, jam_booking FROM bookings WHERE user_nama=? ORDER BY id DESC", (user_nama,))
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+def delete_user_booking(user_nama, lapangan_nama):
+    """Menghapus riwayat booking berdasarkan user dan lapangan."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM bookings WHERE user_nama=? AND lapangan_nama=?", (user_nama, lapangan_nama))
+    conn.commit()
+    conn.close()
+
+def update_user_profile(old_nama, new_nama, new_password):
+    """Memperbarui nama dan/atau password pengguna di database secara permanen."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    # PERBAIKAN: Mengganti 'username' menjadi 'nama' menyesuaikan kolom di database Anda
+    if new_password:
+        cursor.execute("UPDATE users SET nama=?, password=? WHERE nama=?", (new_nama, new_password, old_nama))
+    else:
+        cursor.execute("UPDATE users SET nama=? WHERE nama=?", (new_nama, old_nama))
+        
+    # Update juga nama di tabel bookings agar riwayat transaksi lama tidak hilang
+    if old_nama != new_nama:
+        cursor.execute("UPDATE bookings SET user_nama=? WHERE user_nama=?", (new_nama, old_nama))
+        
+    conn.commit()
+    conn.close()
+    return True
