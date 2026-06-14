@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import datetime
 from PySide6.QtWidgets import QApplication, QStackedWidget, QMessageBox
 from PySide6.QtCore import Qt
 
@@ -14,7 +15,7 @@ from ui.notif_sukses import NotifSuksesPage
 from ui.history import HistoryPage 
 from ui.pengaturan import PengaturanPage 
 
-# Import Fungsi Database (Pastikan update_user_profile ditambahkan ke sini)
+# Import Fungsi Database
 from database.db_manager import (init_db, get_booked_slots, save_booking, 
                                    get_user_bookings, delete_user_booking, update_user_profile)
 
@@ -52,9 +53,11 @@ if __name__ == "__main__":
     stacked_widget.addWidget(history_page)  
     stacked_widget.addWidget(pengaturan_page)  
     
+    # PERBAIKAN: Menambahkan sesi sementara untuk tanggal
     current_session = {
         "nama": "",
         "temp_lapangan": "",
+        "temp_tanggal": "",
         "temp_slots": [],
         "temp_harga": 0
     }
@@ -93,7 +96,6 @@ if __name__ == "__main__":
         except AttributeError: pass
 
     def buka_halaman_pengaturan(*args):
-        # Reset form saat masuk (tidak menyimpan sisa ketikan yang dibatalkan)
         pengaturan_page.inp_nama.clear()
         pengaturan_page.inp_pass.clear()
         pengaturan_page.inp_conf_pass.clear()
@@ -106,15 +108,13 @@ if __name__ == "__main__":
     # --- FUNGSI LOGIKA DAN TRANSAKSI ---
 
     def proses_logout():
-        """Menghapus sesi pengguna dan mengalihkan ke form login"""
         current_session["nama"] = ""
         current_session["temp_lapangan"] = ""
+        current_session["temp_tanggal"] = ""
         current_session["temp_slots"] = []
         buka_halaman_login()
 
     def simpan_pengaturan(nama_baru, pwd, conf_pwd):
-        """Memvalidasi dan memperbarui data akun ke dalam database"""
-        # 1. Validasi Password
         if pwd != "" or conf_pwd != "":
             if pwd != conf_pwd:
                 QMessageBox.warning(pengaturan_page, "Peringatan", "Konfirmasi Kata Sandi tidak cocok!")
@@ -123,26 +123,21 @@ if __name__ == "__main__":
         old_nama = current_session["nama"]
         final_nama = nama_baru.strip() if nama_baru.strip() != "" else old_nama
 
-        # 2. Proses ke Database
         update_user_profile(old_nama, final_nama, pwd)
-        
-        # 3. Update Sesi Saat Ini
         current_session["nama"] = final_nama
         
-        # 4. Terapkan Nama Baru Secara Keseluruhan pada UI
         home_page.user_name.setText(final_nama)
         home_page.h_title.setText(f"Hallo, <b style='color:#22C55E;'>{final_nama}!</b>")
         booking_page.user_name.setText(final_nama)
         history_page.user_name.setText(final_nama)
         
         QMessageBox.information(pengaturan_page, "Sukses", "Perubahan profil berhasil disimpan secara permanen!")
-        
-        # Kembali ke beranda setelah berhasil menyimpan
         buka_halaman_beranda()
 
-    def hapus_riwayat(lapangan_nama):
+    def hapus_riwayat(lapangan_nama, tanggal):
+        # PERBAIKAN: Menghapus riwayat harus membutuhkan spesifik tanggal juga
         user_aktif = current_session["nama"]
-        delete_user_booking(user_aktif, lapangan_nama)
+        delete_user_booking(user_aktif, lapangan_nama, tanggal)
         buka_halaman_history()
 
     def saat_login_berhasil(nama_user):
@@ -153,15 +148,23 @@ if __name__ == "__main__":
         buka_halaman_beranda()
 
     def buka_detail_lapangan(nama, img_name, harga):
-        booked = get_booked_slots(nama)
+        # PERBAIKAN: Selalu ambil tanggal hari ini (default) saat kartu lapangan diklik
+        today_str = datetime.now().strftime("%d %B %Y")
+        booked = get_booked_slots(nama, today_str)
         detail_page.load_data(nama, img_name, harga, booked)
         stacked_widget.setCurrentWidget(detail_page)
         stacked_widget.setWindowTitle(f"SportBook - {nama}")
 
-    def lanjut_ke_pembayaran(lapangan_nama, list_jam, total_harga):
+    def refresh_jam_berdasarkan_tanggal(lapangan_nama, tanggal_baru):
+        # DITAMBAHKAN: Memuat ulang jam jika dropdown diganti
+        booked = get_booked_slots(lapangan_nama, tanggal_baru)
+        detail_page.refresh_slots(booked)
+
+    def lanjut_ke_pembayaran(lapangan_nama, list_jam, total_harga, tanggal):
         current_session["temp_lapangan"] = lapangan_nama
         current_session["temp_slots"] = list_jam
         current_session["temp_harga"] = total_harga
+        current_session["temp_tanggal"] = tanggal
         
         jumlah_jam = len(list_jam)
         pembayaran_page.load_data(jumlah_jam, total_harga)
@@ -172,8 +175,10 @@ if __name__ == "__main__":
         user_aktif = current_session["nama"]
         lapangan = current_session["temp_lapangan"]
         slots = current_session["temp_slots"]
+        tanggal = current_session["temp_tanggal"]
         
-        sukses = save_booking(user_aktif, lapangan, slots)
+        # PERBAIKAN: Save booking sekarang melempar parameter tanggal
+        sukses = save_booking(user_aktif, lapangan, tanggal, slots)
         if sukses:
             current_session["temp_slots"] = []
             stacked_widget.setCurrentWidget(sukses_page)
@@ -183,13 +188,11 @@ if __name__ == "__main__":
     
     # --- HUBUNGAN SIGNAL DAN SLOT (NAVIGASI & AKSI) ---
     
-    # 1. Login & Register
     login_page.footer_link.clicked.connect(buka_halaman_register)
     register_page.f_link.clicked.connect(buka_halaman_login)
     login_page.login_successful.connect(saat_login_berhasil)
     register_page.register_successful.connect(buka_halaman_login)
 
-    # 2. Bottom Navbar
     home_page.btn_booking.clicked.connect(buka_halaman_booking)
     home_page.btn_hist.clicked.connect(buka_halaman_history)
     home_page.btn_settings.clicked.connect(buka_halaman_pengaturan)
@@ -208,7 +211,6 @@ if __name__ == "__main__":
     pengaturan_page.btn_booking.clicked.connect(buka_halaman_booking)
     pengaturan_page.btn_hist.clicked.connect(buka_halaman_history)
 
-    # 3. Topbar: Jadikan Nama dan Icon User bisa diklik untuk masuk Pengaturan
     def buat_label_bisa_diklik(label_widget):
         label_widget.setCursor(Qt.PointingHandCursor)
         label_widget.mousePressEvent = buka_halaman_pengaturan
@@ -220,18 +222,19 @@ if __name__ == "__main__":
     buat_label_bisa_diklik(history_page.user_name)
     buat_label_bisa_diklik(history_page.icon_user)
 
-    # 4. Aksi Pengaturan (Simpan / Logout)
     pengaturan_page.save_clicked.connect(simpan_pengaturan)
     pengaturan_page.logout_clicked.connect(proses_logout)
 
-    # 5. Aksi Hapus di History
     history_page.request_delete.connect(hapus_riwayat)
     
-    # 6. Alur Transaksi Booking Lapangan
     home_page.request_book.connect(buka_detail_lapangan)
     booking_page.request_book.connect(buka_detail_lapangan)
+    
     detail_page.go_back.connect(buka_halaman_booking)
     detail_page.proceed_checkout.connect(lanjut_ke_pembayaran)
+    # DITAMBAHKAN: Sambungan signal saat ganti tanggal
+    detail_page.request_date_change.connect(refresh_jam_berdasarkan_tanggal)
+    
     pembayaran_page.go_back.connect(lambda: stacked_widget.setCurrentWidget(detail_page))
     pembayaran_page.confirm_payment.connect(proses_pembayaran_final)
     sukses_page.back_to_home.connect(buka_halaman_beranda)

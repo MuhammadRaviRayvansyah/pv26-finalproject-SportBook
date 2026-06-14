@@ -1,11 +1,18 @@
 import os
+import locale
+from datetime import datetime, timedelta
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QFrame, QScrollArea, QSizePolicy, 
-                             QGraphicsDropShadowEffect, QGridLayout)
+                             QGraphicsDropShadowEffect, QGridLayout, QComboBox)
 from PySide6.QtCore import Qt, Signal, QSize
 from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+try:
+    locale.setlocale(locale.LC_TIME, 'id_ID.utf8')
+except:
+    pass
 
 def create_colored_icon(icon_path, color, size=24):
     pixmap = QPixmap(icon_path)
@@ -51,8 +58,11 @@ class CardImage(QWidget):
 
 
 class DetailBookingPage(QWidget):
-    proceed_checkout = Signal(str, list, int)
+    # DITAMBAHKAN: parameter string untuk mengirim tanggal
+    proceed_checkout = Signal(str, list, int, str) 
     go_back = Signal()
+    # DITAMBAHKAN: sinyal untuk meminta jam kosong saat tanggal diganti
+    request_date_change = Signal(str, str) 
 
     def __init__(self):
         super().__init__()
@@ -226,6 +236,63 @@ class DetailBookingPage(QWidget):
 
         self.scroll_layout.addWidget(self.card_detail)
 
+        # =====================================================================
+        # DITAMBAHKAN: CARD TANGGAL
+        # =====================================================================
+        self.card_tanggal = QFrame()
+        self.card_tanggal.setObjectName("detailCard")
+        shadow_tgl = QGraphicsDropShadowEffect(self)
+        shadow_tgl.setBlurRadius(20)
+        shadow_tgl.setXOffset(0)
+        shadow_tgl.setYOffset(6)
+        shadow_tgl.setColor(QColor(0, 0, 0, 30))
+        self.card_tanggal.setGraphicsEffect(shadow_tgl)
+
+        tgl_layout = QVBoxLayout(self.card_tanggal)
+        tgl_layout.setContentsMargins(20, 15, 20, 15)
+        tgl_layout.setSpacing(10)
+
+        lbl_pilih_tgl = QLabel("Pilih Tanggal Booking:")
+        lbl_pilih_tgl.setObjectName("detailTextBold")
+        tgl_layout.addWidget(lbl_pilih_tgl)
+
+        self.date_combo = QComboBox()
+        self.date_combo.setFixedHeight(45)
+        self.date_combo.setCursor(Qt.PointingHandCursor)
+        self.date_combo.setStyleSheet("""
+            QComboBox {
+                border: 2px solid #D1D5DB;
+                border-radius: 10px;
+                padding: 5px 15px;
+                font-size: 14px;
+                font-weight: bold;
+                background-color: white;
+                color: #111827;
+            }
+            QComboBox::drop-down { border: none; width: 30px; }
+            QComboBox QAbstractItemView {
+                background-color: white;
+                color: #111827;
+                selection-background-color: #22C55E;
+                selection-color: white;
+                border: 1px solid #D1D5DB;
+                outline: none;
+            }
+        """)
+        
+        # Isi dropdown 30 hari ke depan
+        today = datetime.now()
+        for i in range(30):
+            date_val = today + timedelta(days=i)
+            date_str = date_val.strftime("%d %B %Y")
+            self.date_combo.addItem(date_str)
+            
+        self.date_combo.currentTextChanged.connect(self.on_date_changed)
+        tgl_layout.addWidget(self.date_combo)
+        
+        self.scroll_layout.addWidget(self.card_tanggal)
+        # =====================================================================
+
         # CARD 2: Pilihan Jam
         self.card_jam = QFrame()
         self.card_jam.setObjectName("detailCard")
@@ -279,6 +346,12 @@ class DetailBookingPage(QWidget):
         self.main_layout.addWidget(self.scroll)
         self.top_nav.raise_()
 
+    # DITAMBAHKAN: Fungsi ketika dropdown tanggal diganti
+    def on_date_changed(self, new_date):
+        self.selected_slots.clear()
+        self.lbl_durasi.setText("0 JAM")
+        self.request_date_change.emit(self.lapangan_nama, new_date)
+
     def load_data(self, nama, img_name, harga_int, booked_slots):
         self.lapangan_nama = nama
         self.harga_per_jam = harga_int
@@ -293,6 +366,15 @@ class DetailBookingPage(QWidget):
         img_path = os.path.join(BASE_DIR, "assets", "images", img_name)
         self.img_widget.set_image(img_path)
 
+        # DITAMBAHKAN: Reset dropdown ke hari ini tanpa memicu sinyal
+        self.date_combo.blockSignals(True)
+        self.date_combo.setCurrentIndex(0)
+        self.date_combo.blockSignals(False)
+
+        self.build_time_grid(booked_slots)
+
+    # DITAMBAHKAN: Fungsi untuk me-refresh grid saat tanggal diganti
+    def refresh_slots(self, booked_slots):
         self.build_time_grid(booked_slots)
 
     def build_time_grid(self, booked_slots):
@@ -347,4 +429,7 @@ class DetailBookingPage(QWidget):
             return 
         
         total_harga = len(self.selected_slots) * self.harga_per_jam
-        self.proceed_checkout.emit(self.lapangan_nama, self.selected_slots, total_harga)
+        tanggal_terpilih = self.date_combo.currentText()
+        
+        # DITAMBAHKAN: Mengirim tanggal terpilih
+        self.proceed_checkout.emit(self.lapangan_nama, self.selected_slots, total_harga, tanggal_terpilih)

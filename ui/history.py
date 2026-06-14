@@ -23,9 +23,9 @@ def create_colored_icon(icon_path, color, size=28):
     return QIcon()
 
 class HistoryCard(QFrame):
-    delete_clicked = Signal(str)
+    delete_clicked = Signal(str, str) # PERBAIKAN: Sekarang mengirim lapangan dan tanggal
 
-    def __init__(self, lapangan_nama, jam_range, parent=None):
+    def __init__(self, lapangan_nama, jam_range, tanggal_booking, parent=None):
         super().__init__(parent)
         self.setObjectName("historyCard")
         self.setFixedHeight(200) 
@@ -88,10 +88,11 @@ class HistoryCard(QFrame):
         self.lbl_nama = QLabel(lapangan_nama)
         self.lbl_nama.setStyleSheet("font-size: 22px; font-weight: bold; color: #111827;")
         
+        # PERBAIKAN: Menampilkan Tanggal Aktual dari Database
         date_layout = QHBoxLayout()
         icon_date = QLabel()
         icon_date.setPixmap(create_colored_icon(os.path.join(BASE_DIR, "assets", "icons", "schedule.svg"), QColor(0,0,0), 18).pixmap(18,18))
-        lbl_date = QLabel("Juni 14, 2026") 
+        lbl_date = QLabel(tanggal_booking) 
         lbl_date.setStyleSheet("font-weight: bold; color: #000;")
         date_layout.addWidget(icon_date)
         date_layout.addWidget(lbl_date)
@@ -133,7 +134,8 @@ class HistoryCard(QFrame):
             }
         """)
         self.btn_hapus.setFixedSize(80, 25)
-        self.btn_hapus.clicked.connect(lambda: self.delete_clicked.emit(lapangan_nama))
+        # PERBAIKAN: Mengirim tanggal saat tombol hapus diklik
+        self.btn_hapus.clicked.connect(lambda: self.delete_clicked.emit(lapangan_nama, tanggal_booking))
         
         action_layout.addWidget(self.btn_hapus)
         action_layout.addStretch()
@@ -149,7 +151,7 @@ class HistoryCard(QFrame):
 
 
 class HistoryPage(QWidget):
-    request_delete = Signal(str)
+    request_delete = Signal(str, str) # PERBAIKAN: Menangkap Lapangan dan Tanggal
 
     def __init__(self):
         super().__init__()
@@ -301,7 +303,7 @@ class HistoryPage(QWidget):
         self.top_nav.raise_()
         self.bot_nav.raise_()
 
-    def show_delete_confirmation(self, lapangan_nama):
+    def show_delete_confirmation(self, lapangan_nama, tanggal_booking):
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle("Notifikasi")
         msg_box.setText("Apakah anda ingin menghapus riwayat tersebut?")
@@ -313,10 +315,9 @@ class HistoryPage(QWidget):
         msg_box.exec()
         
         if msg_box.clickedButton() == btn_iya:
-            self.request_delete.emit(lapangan_nama)
+            self.request_delete.emit(lapangan_nama, tanggal_booking)
 
     def load_history(self, bookings):
-        # PERBAIKAN: Menghapus total seluruh widget dan spacer hingga layout kosong sempurna
         while self.scroll_layout.count():
             item = self.scroll_layout.takeAt(0)
             widget = item.widget()
@@ -329,19 +330,23 @@ class HistoryPage(QWidget):
             empty_lbl.setStyleSheet("font-size: 16px; color: #71717A; font-family: 'Segoe UI';")
             self.scroll_layout.addWidget(empty_lbl)
         else:
+            # PERBAIKAN: Mengelompokkan riwayat berdasarkan nama lapangan DAN tanggal
             grouped_bookings = {}
             for b in bookings:
                 lapangan_nama = b[0]
-                jam_booking = b[1]
-                if lapangan_nama not in grouped_bookings:
-                    grouped_bookings[lapangan_nama] = []
-                grouped_bookings[lapangan_nama].append(jam_booking)
+                tanggal_booking = b[1]
+                jam_booking = b[2]
+                
+                key = (lapangan_nama, tanggal_booking)
+                if key not in grouped_bookings:
+                    grouped_bookings[key] = []
+                grouped_bookings[key].append(jam_booking)
 
-            for lapangan, list_jam in grouped_bookings.items():
+            for (lapangan, tanggal), list_jam in grouped_bookings.items():
                 list_jam_sorted = sorted(list_jam)
                 jam_gabungan = ", ".join(list_jam_sorted)
                 
-                card = HistoryCard(lapangan, jam_gabungan)
+                card = HistoryCard(lapangan, jam_gabungan, tanggal)
                 card.delete_clicked.connect(self.show_delete_confirmation)
                 self.scroll_layout.addWidget(card)
 
