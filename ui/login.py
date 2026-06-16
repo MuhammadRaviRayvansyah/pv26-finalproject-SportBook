@@ -36,7 +36,7 @@ class BackgroundFrame(QFrame):
 
 
 class MainWindow(QWidget):
-    login_successful = Signal(str)
+    login_successful = Signal(str, str) # nama_user, role_user
 
     def __init__(self):
         super().__init__()
@@ -186,7 +186,7 @@ class MainWindow(QWidget):
             self.email_input.clear()
             self.pass_input.clear()
             
-            # Emit signal dengan membawa nama user
-            self.login_successful.emit(nama_user)
+            # Emit signal dengan membawa nama user dan role
+            self.login_successful.emit(nama_user, role_user)
         else:
             QMessageBox.critical(self, "Gagal", "Email atau Password salah!")

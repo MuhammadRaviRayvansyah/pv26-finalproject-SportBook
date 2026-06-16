@@ -263,17 +263,12 @@ class BookingPage(QWidget):
         content_layout.setContentsMargins(25, 25, 25, 25)
         content_layout.setSpacing(25)
         
-        card1 = FieldCard("lapangan_1.jpg", "Lapangan 1", "200.000")
-        card1.request_book.connect(self.request_book.emit)
-        content_layout.addWidget(card1)
-
-        card2 = FieldCard("lapangan_2.jpg", "Lapangan 2", "200.000")
-        card2.request_book.connect(self.request_book.emit)
-        content_layout.addWidget(card2)
-
-        card3 = FieldCard("lapangan_3.jpg", "Lapangan 3", "200.000")
-        card3.request_book.connect(self.request_book.emit)
-        content_layout.addWidget(card3)
+        # Container untuk kartu lapangan dinamis
+        self.fields_container = QWidget()
+        self.fields_layout = QVBoxLayout(self.fields_container)
+        self.fields_layout.setContentsMargins(0, 0, 0, 0)
+        self.fields_layout.setSpacing(25)
+        content_layout.addWidget(self.fields_container)
 
         self.scroll_layout.addWidget(content_widget)
         self.scroll.setWidget(self.scroll_content)
@@ -344,3 +339,17 @@ class BookingPage(QWidget):
 
         self.top_nav.raise_()
         self.bot_nav.raise_()
+
+    def load_dynamic_fields(self, fields):
+        # Bersihkan layout lama
+        while self.fields_layout.count():
+            item = self.fields_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        
+        # Tambahkan kartu baru berdasarkan database
+        for f in fields:
+            # f: (id, nama, gambar, harga, deskripsi, kategori)
+            card = FieldCard(f[2], f[1], f[3])
+            card.request_book.connect(self.request_book.emit)
+            self.fields_layout.addWidget(card)

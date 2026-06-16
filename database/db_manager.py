@@ -23,7 +23,7 @@ def init_db():
         )
     ''')
     
-    # Tabel Bookings (Baru)
+    # Tabel Bookings
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS bookings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,9 +33,174 @@ def init_db():
             jam_booking TEXT NOT NULL
         )
     ''')
+
+    # Tabel Lapangan (Baru)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS lapangan (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nama TEXT NOT NULL,
+            gambar TEXT NOT NULL,
+            harga TEXT NOT NULL,
+            deskripsi TEXT,
+            kategori TEXT
+        )
+    ''')
+
+    # Tabel Kategori (Baru)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS kategori (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nama TEXT UNIQUE NOT NULL
+        )
+    ''')
     
+    # --- MIGRASI DATA AWAL ---
+    
+    # 1. Tambah Admin Default jika belum ada
+    cursor.execute("SELECT * FROM users WHERE email='admin@sportbook.com'")
+    if not cursor.fetchone():
+        cursor.execute("INSERT INTO users (nama, email, password, role) VALUES (?, ?, ?, ?)",
+                       ("Admin SportBook", "admin@sportbook.com", "admin123", "admin"))
+
+    # 2. Tambah Kategori Default
+    default_categories = ["Futsal", "Basket", "Badminton"]
+    for cat in default_categories:
+        cursor.execute("INSERT OR IGNORE INTO kategori (nama) VALUES (?)", (cat,))
+
+    # 3. Tambah Lapangan Default jika tabel kosong
+    cursor.execute("SELECT COUNT(*) FROM lapangan")
+    if cursor.fetchone()[0] == 0:
+        default_fields = [
+            ("Lapangan 1", "lapangan_1.jpg", "200.000", "Lapangan futsal dengan rumput sintetis berkualitas.", "Futsal"),
+            ("Lapangan 2", "lapangan_2.jpg", "200.000", "Lapangan basket indoor dengan lantai kayu standar internasional.", "Basket"),
+            ("Lapangan 3", "lapangan_3.jpg", "200.000", "Lapangan badminton dengan karpet standar PBSI.", "Badminton")
+        ]
+        cursor.executemany("INSERT INTO lapangan (nama, gambar, harga, deskripsi, kategori) VALUES (?, ?, ?, ?, ?)", default_fields)
+
     conn.commit()
     conn.close()
+
+# --- FUNGSI CRUD LAPANGAN ---
+
+def get_all_fields():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nama, gambar, harga, deskripsi, kategori FROM lapangan ORDER BY id DESC")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+def add_field(nama, gambar, harga, deskripsi, kategori):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO lapangan (nama, gambar, harga, deskripsi, kategori) VALUES (?, ?, ?, ?, ?)",
+                       (nama, gambar, harga, deskripsi, kategori))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error add field: {e}")
+        return False
+    finally:
+        conn.close()
+
+def update_field(field_id, nama, gambar, harga, deskripsi, kategori):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE lapangan SET nama=?, gambar=?, harga=?, deskripsi=?, kategori=? WHERE id=?",
+                       (nama, gambar, harga, deskripsi, field_id))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error update field: {e}")
+        return False
+    finally:
+        conn.close()
+
+def delete_field(field_id):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM lapangan WHERE id=?", (field_id,))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error delete field: {e}")
+        return False
+    finally:
+        conn.close()
+
+# --- FUNGSI CRUD KATEGORI ---
+
+def get_all_categories():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nama FROM kategori ORDER BY nama ASC")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+def add_category(nama):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO kategori (nama) VALUES (?)", (nama,))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        conn.close()
+
+def delete_category(cat_id):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM kategori WHERE id=?", (cat_id,))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error delete category: {e}")
+        return False
+    finally:
+        conn.close()
+
+# --- FUNGSI STATISTIK ADMIN ---
+
+def get_all_bookings_admin():
+    """Mengambil seluruh daftar booking untuk Admin."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT user_nama, lapangan_nama, tanggal, jam_booking FROM bookings ORDER BY id DESC")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+def get_admin_stats():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT COUNT(*) FROM users WHERE role='user'")
+    total_users = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM bookings")
+    total_bookings = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM lapangan")
+    total_fields = cursor.fetchone()[0]
+    
+    # Estimasi pendapatan (Total booking * harga rata-rata 200rb sebagai dummy logic sederhana)
+    # Jika ingin akurat, harus simpan harga di tabel bookings
+    total_revenue = total_bookings * 200000
+    
+    conn.close()
+    return {
+        "users": total_users,
+        "bookings": total_bookings,
+        "fields": total_fields,
+        "revenue": total_revenue
+    }
 
 def register_user(nama, email, password, role='user'):
     conn = sqlite3.connect(DB_PATH)
