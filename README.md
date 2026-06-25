@@ -66,7 +66,8 @@ python main.py
 
 #### Admin
 
-Sesuaikan dengan akun admin yang terdapat pada database.
+Admin
+234567
 
 #### User
 
