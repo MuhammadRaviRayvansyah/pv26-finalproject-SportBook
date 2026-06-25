@@ -57,12 +57,12 @@ if __name__ == "__main__":
     # Menu Help -> About
     help_menu = menu_bar.addMenu("Help")
     about_action = QAction("About", main_window)
-    about_action.triggered.connect(lambda: QMessageBox.information(main_window, "Tentang", "Aplikasi SportBook v1.0"))
+    about_action.triggered.connect(lambda: QMessageBox.information(main_window, "Tentang", "Aplikasi SportBook"))
     help_menu.addAction(about_action)
 
     # --- 3. INISIALISASI STATUS BAR ---
     status_bar = main_window.statusBar()
-    lbl_status = QLabel("Kelompok 12: Adit (NIM: MasukkanNIM) | Anggota 2 (NIM: MasukkanNIM)")
+    lbl_status = QLabel("Kelompok 10: Muhammad Ravi Rayvansyah - F1D02410078 | Yudhi Fajar Pratama - F1D02310142 | M. Danuarta Wiraguna - F1D02310124")
     lbl_status.setStyleSheet("color: #4B5563; font-weight: bold; margin-left: 10px;")
     status_bar.addWidget(lbl_status)
 

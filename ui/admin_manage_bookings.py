@@ -1,10 +1,11 @@
 import os
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                                QTableWidget, QTableWidgetItem, QHeaderView,
-                               QAbstractItemView, QFrame, QLineEdit, QComboBox)
+                               QAbstractItemView, QFrame, QLineEdit, QComboBox, QPushButton, QMessageBox)
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from database.db_manager import get_all_bookings_admin
+from fpdf import FPDF
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -54,11 +55,8 @@ class AdminManageBookings(QWidget):
         filter_layout = QHBoxLayout()
         filter_layout.setSpacing(15)
 
-        # Input Pencarian Teks (Dengan Icon SVG)
         self.inp_search = QLineEdit()
         self.inp_search.setPlaceholderText("Cari nama pengguna...")
-        
-        # Menambahkan icon SVG ke dalam kolom pencarian (di sisi kiri/Leading)
         search_icon_path = os.path.join(BASE_DIR, "assets", "icons", "search.svg")
         self.inp_search.addAction(QIcon(search_icon_path), QLineEdit.LeadingPosition)
         
@@ -108,6 +106,23 @@ class AdminManageBookings(QWidget):
         filter_layout.addWidget(self.inp_search, stretch=3)
         filter_layout.addWidget(self.combo_filter, stretch=1)
         content_layout.addLayout(filter_layout)
+
+        # Tombol Export PDF
+        self.btn_export = QPushButton("Cetak PDF")
+        self.btn_export.setStyleSheet("""
+            QPushButton {
+                padding: 10px 20px;
+                background-color: #10B981;
+                color: white;
+                border-radius: 8px;
+                font-weight: bold;
+            }
+            QPushButton:hover { background-color: #059669; }
+        """)
+        self.btn_export.clicked.connect(self.export_to_pdf)
+        filter_layout.addWidget(self.inp_search, stretch=3)
+        filter_layout.addWidget(self.combo_filter, stretch=1)
+        filter_layout.addWidget(self.btn_export)
 
         # --- 4. PENGATURAN TABEL ---
         self.table = QTableWidget()
@@ -196,3 +211,30 @@ class AdminManageBookings(QWidget):
                     item.setTextAlignment(Qt.AlignCenter)
                     self.table.setItem(row_idx, col_idx, item)
                 row_idx += 1
+
+    def export_to_pdf(self):
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", 'B', 16)
+        pdf.cell(200, 10, txt="Laporan Data Booking", ln=True, align='C')
+        pdf.ln(10)
+
+        # Header Tabel PDF
+        pdf.set_font("Arial", 'B', 12)
+        headers = ["User", "Lapangan", "Tanggal", "Jam"]
+        for h in headers:
+            pdf.cell(47, 10, h, border=1, align='C')
+        pdf.ln()
+
+        # Isi Tabel
+        pdf.set_font("Arial", '', 10)
+        for i in range(self.table.rowCount()):
+            for j in range(4):
+                text = self.table.item(i, j).text()
+                pdf.cell(47, 10, text, border=1, align='C')
+            pdf.ln()
+
+        # Simpan file
+        file_path = "Laporan_Booking.pdf"
+        pdf.output(file_path)
+        QMessageBox.information(self, "Sukses", f"Laporan berhasil disimpan sebagai {file_path}")

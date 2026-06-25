@@ -4,8 +4,7 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QFrame, QGridLayout, QGraphicsDropShadowEffect,
                              QScrollArea, QPushButton, QFileDialog, QMessageBox, QSizePolicy)
 from PySide6.QtCore import Qt, QMargins
-from PySide6.QtGui import QColor, QFont, QPainter
-# Mengimpor modul Chart dari PySide6
+from PySide6.QtGui import QColor, QPainter
 from PySide6.QtCharts import QChart, QChartView, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 
 from database.db_manager import get_admin_stats
