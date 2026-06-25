@@ -1,8 +1,10 @@
 import sys
 import os
 from datetime import datetime
-from PySide6.QtWidgets import QApplication, QStackedWidget, QMessageBox, QWidget, QHBoxLayout
+from PySide6.QtWidgets import (QApplication, QStackedWidget, QMessageBox, QWidget, 
+                               QHBoxLayout, QMainWindow, QLabel)
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QAction
 
 # Import Semua Halaman UI (User)
 from ui.login import MainWindow as LoginPage
@@ -18,9 +20,7 @@ from ui.pengaturan import PengaturanPage
 # Import Semua Halaman UI (Admin)
 from ui.admin_sidebar import AdminSidebar
 from ui.admin_dashboard import AdminDashboard
-from ui.admin_manage_fields import AdminManageFields
-from ui.admin_field_form import AdminFieldForm
-from ui.admin_manage_categories import AdminManageCategories
+from ui.admin_pengaturan import AdminPengaturan
 from ui.admin_manage_bookings import AdminManageBookings
 
 # Import Fungsi Database
@@ -40,7 +40,35 @@ if __name__ == "__main__":
     style_path = os.path.join(os.path.dirname(__file__), "styles", "style.qss")
     load_stylesheet(app, style_path)
     
+    # --- 1. INISIALISASI BINGKAI UTAMA (MAIN WINDOW) ---
+    main_window = QMainWindow()
+    main_window.setMinimumSize(800, 500)
+    main_window.resize(1000, 600)
+    
+    # --- 2. INISIALISASI MENU BAR ---
+    menu_bar = main_window.menuBar()
+    
+    # Menu File -> Exit
+    file_menu = menu_bar.addMenu("File")
+    exit_action = QAction("Exit", main_window)
+    exit_action.triggered.connect(main_window.close)
+    file_menu.addAction(exit_action)
+    
+    # Menu Help -> About
+    help_menu = menu_bar.addMenu("Help")
+    about_action = QAction("About", main_window)
+    about_action.triggered.connect(lambda: QMessageBox.information(main_window, "Tentang", "Aplikasi SportBook v1.0"))
+    help_menu.addAction(about_action)
+
+    # --- 3. INISIALISASI STATUS BAR ---
+    status_bar = main_window.statusBar()
+    lbl_status = QLabel("Kelompok 12: Adit (NIM: MasukkanNIM) | Anggota 2 (NIM: MasukkanNIM)")
+    lbl_status.setStyleSheet("color: #4B5563; font-weight: bold; margin-left: 10px;")
+    status_bar.addWidget(lbl_status)
+
+    # --- 4. KONTEN UTAMA (CENTRAL WIDGET) ---
     stacked_widget = QStackedWidget()
+    main_window.setCentralWidget(stacked_widget)
     
     # --- INISIALISASI HALAMAN USER ---
     login_page = LoginPage()
@@ -73,23 +101,17 @@ if __name__ == "__main__":
     admin_stacked = QStackedWidget()
     
     admin_dashboard = AdminDashboard()
-    admin_fields = AdminManageFields()
-    admin_field_form = AdminFieldForm()
-    admin_categories = AdminManageCategories()
     admin_bookings = AdminManageBookings()
+    admin_pengaturan_page = AdminPengaturan()
     
     admin_stacked.addWidget(admin_dashboard)
-    admin_stacked.addWidget(admin_fields)
-    admin_stacked.addWidget(admin_field_form)
-    admin_stacked.addWidget(admin_categories)
     admin_stacked.addWidget(admin_bookings)
-    
+    admin_stacked.addWidget(admin_pengaturan_page)
     admin_main_layout.addWidget(admin_sidebar)
     admin_main_layout.addWidget(admin_stacked)
     
     stacked_widget.addWidget(admin_main_page)
     
-    # PERBAIKAN: Menambahkan sesi sementara untuk tanggal
     current_session = {
         "nama": "",
         "temp_lapangan": "",
@@ -101,25 +123,23 @@ if __name__ == "__main__":
     # --- FUNGSI-FUNGSI NAVIGASI HALAMAN ---
     def buka_halaman_register():
         stacked_widget.setCurrentWidget(register_page)
-        stacked_widget.setWindowTitle("SportBook - Register")
+        main_window.setWindowTitle("SportBook - Register")
         
     def buka_halaman_login():
         stacked_widget.setCurrentWidget(login_page)
-        stacked_widget.setWindowTitle("SportBook - Login")
+        main_window.setWindowTitle("SportBook - Login")
         
     def buka_halaman_beranda():
-        # DITAMBAHKAN: Refresh data lapangan agar dinamis
         home_page.load_dynamic_fields(get_all_fields())
         stacked_widget.setCurrentWidget(home_page)
-        stacked_widget.setWindowTitle("SportBook - Beranda")
+        main_window.setWindowTitle("SportBook - Beranda")
         try: home_page.scroll.verticalScrollBar().setValue(0)
         except AttributeError: pass
 
     def buka_halaman_booking():
-        # DITAMBAHKAN: Refresh data lapangan agar dinamis
         booking_page.load_dynamic_fields(get_all_fields())
         stacked_widget.setCurrentWidget(booking_page)
-        stacked_widget.setWindowTitle("SportBook - Booking")
+        main_window.setWindowTitle("SportBook - Booking")
         try: booking_page.scroll.verticalScrollBar().setValue(0)
         except AttributeError: pass
             
@@ -131,7 +151,7 @@ if __name__ == "__main__":
         history_page.load_history(data_history)
         
         stacked_widget.setCurrentWidget(history_page)
-        stacked_widget.setWindowTitle("SportBook - Riwayat")
+        main_window.setWindowTitle("SportBook - Riwayat")
         try: history_page.scroll.verticalScrollBar().setValue(0)
         except AttributeError: pass
 
@@ -141,7 +161,7 @@ if __name__ == "__main__":
         pengaturan_page.inp_conf_pass.clear()
         
         stacked_widget.setCurrentWidget(pengaturan_page)
-        stacked_widget.setWindowTitle("SportBook - Pengaturan Akun")
+        main_window.setWindowTitle("SportBook - Pengaturan Akun")
         try: pengaturan_page.scroll.verticalScrollBar().setValue(0)
         except AttributeError: pass
     
@@ -150,10 +170,9 @@ if __name__ == "__main__":
         admin_sidebar.set_active("dashboard")
         admin_stacked.setCurrentWidget(admin_dashboard)
         stacked_widget.setCurrentWidget(admin_main_page)
-        stacked_widget.setWindowTitle("SportBook - Admin Panel")
+        main_window.setWindowTitle("SportBook - Admin Panel")
         
     # --- FUNGSI LOGIKA DAN TRANSAKSI ---
-
     def proses_logout():
         current_session["nama"] = ""
         current_session["temp_lapangan"] = ""
@@ -181,8 +200,13 @@ if __name__ == "__main__":
         QMessageBox.information(pengaturan_page, "Sukses", "Perubahan profil berhasil disimpan secara permanen!")
         buka_halaman_beranda()
 
+    def proses_update_admin(nama_baru, sandi_baru):
+        old_nama = current_session["nama"]
+        update_user_profile(old_nama, nama_baru, sandi_baru)
+        current_session["nama"] = nama_baru
+        QMessageBox.information(admin_pengaturan_page, "Sukses", "Kredensial admin berhasil diperbarui!")
+
     def hapus_riwayat(lapangan_nama, tanggal):
-        # PERBAIKAN: Menghapus riwayat harus membutuhkan spesifik tanggal juga
         user_aktif = current_session["nama"]
         delete_user_booking(user_aktif, lapangan_nama, tanggal)
         buka_halaman_history()
@@ -198,15 +222,13 @@ if __name__ == "__main__":
             buka_halaman_beranda()
 
     def buka_detail_lapangan(nama, img_name, harga):
-        # PERBAIKAN: Selalu ambil tanggal hari ini (default) saat kartu lapangan diklik
         today_str = datetime.now().strftime("%d %B %Y")
         booked = get_booked_slots(nama, today_str)
         detail_page.load_data(nama, img_name, harga, booked)
         stacked_widget.setCurrentWidget(detail_page)
-        stacked_widget.setWindowTitle(f"SportBook - {nama}")
+        main_window.setWindowTitle(f"SportBook - {nama}")
 
     def refresh_jam_berdasarkan_tanggal(lapangan_nama, tanggal_baru):
-        # DITAMBAHKAN: Memuat ulang jam jika dropdown diganti
         booked = get_booked_slots(lapangan_nama, tanggal_baru)
         detail_page.refresh_slots(booked)
 
@@ -219,55 +241,37 @@ if __name__ == "__main__":
         jumlah_jam = len(list_jam)
         pembayaran_page.load_data(jumlah_jam, total_harga)
         stacked_widget.setCurrentWidget(pembayaran_page)
-        stacked_widget.setWindowTitle("SportBook - Pembayaran")
+        main_window.setWindowTitle("SportBook - Pembayaran")
 
     def proses_pembayaran_final(metode):
         user_aktif = current_session["nama"]
         lapangan = current_session["temp_lapangan"]
         slots = current_session["temp_slots"]
         tanggal = current_session["temp_tanggal"]
-        
-        # PERBAIKAN: Save booking sekarang melempar parameter tanggal
+
         sukses = save_booking(user_aktif, lapangan, tanggal, slots)
         if sukses:
             current_session["temp_slots"] = []
             stacked_widget.setCurrentWidget(sukses_page)
-            stacked_widget.setWindowTitle("SportBook - Transaksi Berhasil")
+            main_window.setWindowTitle("SportBook - Transaksi Berhasil")
         else:
             QMessageBox.critical(pembayaran_page, "Error", "Gagal menyimpan jadwal ke database.")
 
     # --- LOGIKA NAVIGASI ADMIN ---
-
     def navigasi_admin(target):
         if target == "dashboard":
             admin_dashboard.refresh_data()
             admin_stacked.setCurrentWidget(admin_dashboard)
-        elif target == "fields":
-            admin_fields.load_data()
-            admin_stacked.setCurrentWidget(admin_fields)
         elif target == "bookings":
             admin_bookings.load_data()
             admin_stacked.setCurrentWidget(admin_bookings)
-        elif target == "categories":
-            admin_categories.load_data()
-            admin_stacked.setCurrentWidget(admin_categories)
+        elif target == "settings":
+            admin_pengaturan_page.set_current_nama(current_session["nama"])
+            admin_stacked.setCurrentWidget(admin_pengaturan_page)
         elif target == "logout":
             proses_logout()
-
-    def buka_tambah_lapangan():
-        admin_field_form.load_form(None)
-        admin_stacked.setCurrentWidget(admin_field_form)
-
-    def buka_edit_lapangan(data):
-        admin_field_form.load_form(data)
-        admin_stacked.setCurrentWidget(admin_field_form)
-
-    def simpan_lapangan_sukses():
-        admin_fields.load_data()
-        admin_stacked.setCurrentWidget(admin_fields)
     
     # --- HUBUNGAN SIGNAL DAN SLOT (NAVIGASI & AKSI) ---
-    
     login_page.footer_link.clicked.connect(buka_halaman_register)
     register_page.f_link.clicked.connect(buka_halaman_login)
     login_page.login_successful.connect(saat_login_berhasil)
@@ -320,16 +324,9 @@ if __name__ == "__main__":
 
     # --- SIGNAL ADMIN ---
     admin_sidebar.nav_changed.connect(navigasi_admin)
-    admin_fields.request_add.connect(buka_tambah_lapangan)
-    admin_fields.request_edit.connect(buka_edit_lapangan)
-    admin_field_form.go_back.connect(lambda: admin_stacked.setCurrentWidget(admin_fields))
-    admin_field_form.save_success.connect(simpan_lapangan_sukses)
+    admin_pengaturan_page.save_clicked.connect(proses_update_admin)
     
-    # --- KONFIGURASI AWAL WINDOW ---
-    stacked_widget.setWindowTitle("SportBook")
-    stacked_widget.setMinimumSize(800, 500)
-    stacked_widget.resize(1000, 600)
-    
+    # --- PENAMPILAN WINDOW ---
     buka_halaman_login()
-    stacked_widget.show()
+    main_window.show()
     sys.exit(app.exec())

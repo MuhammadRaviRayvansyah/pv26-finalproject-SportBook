@@ -1,6 +1,6 @@
 import os
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
-                             QPushButton, QFrame, QScrollArea, QGraphicsDropShadowEffect, QToolButton, QLineEdit, QSizePolicy)
+                               QPushButton, QFrame, QScrollArea, QGraphicsDropShadowEffect, QToolButton, QLineEdit, QSizePolicy)
 from PySide6.QtCore import Qt, Signal, QSize
 from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
 
@@ -28,37 +28,6 @@ class PengaturanPage(QWidget):
     def __init__(self):
         super().__init__()
         self.setup_ui()
-
-    def create_input_card(self, label_text, is_password=False, placeholder=""):
-        card = QFrame()
-        card.setFixedHeight(65)
-        card.setAttribute(Qt.WA_StyledBackground, True)
-        card.setStyleSheet("QFrame { background-color: white; border-radius: 15px; }")
-
-        shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(15)
-        shadow.setXOffset(0)
-        shadow.setYOffset(4)
-        shadow.setColor(QColor(0, 0, 0, 15))
-        card.setGraphicsEffect(shadow)
-
-        layout = QHBoxLayout(card)
-        layout.setContentsMargins(20, 0, 20, 0)
-        layout.setSpacing(10)
-
-        lbl = QLabel(label_text)
-        lbl.setStyleSheet("font-size: 16px; color: black;")
-        lbl.setFixedWidth(180)
-
-        inp = QLineEdit()
-        inp.setPlaceholderText(placeholder)
-        inp.setStyleSheet("background: transparent; border: none; font-size: 16px; color: black;")
-        if is_password:
-            inp.setEchoMode(QLineEdit.Password)
-
-        layout.addWidget(lbl)
-        layout.addWidget(inp)
-        return card, inp
 
     def setup_ui(self):
         self.setObjectName("homePage")
@@ -103,61 +72,123 @@ class PengaturanPage(QWidget):
         self.scroll_layout.setContentsMargins(25, 25, 25, 25)
         self.scroll_layout.setSpacing(20)
 
-        # FORM INPUT
-        card_nama, self.inp_nama = self.create_input_card("Nama Baru:", placeholder="Masukkan nama baru...")
-        card_pass, self.inp_pass = self.create_input_card("Kata Sandi Baru:", True, placeholder="Kosongkan jika tidak diganti")
-        card_conf, self.inp_conf_pass = self.create_input_card("Konfirmasi Kata Sandi Baru:", True, placeholder="Kosongkan jika tidak diganti")
+        # --- KARTU FORMULIR (GAYA ADMIN PENGATURAN) ---
+        card = QFrame()
+        card.setStyleSheet("""
+            QFrame {
+                background-color: white;
+                border-radius: 12px;
+                border: 1px solid #E5E7EB;
+            }
+            QLabel {
+                border: none;
+                font-size: 14px;
+                color: #374151;
+                font-weight: 600;
+            }
+            QLineEdit {
+                padding: 12px 15px;
+                border: 1px solid #D1D5DB;
+                border-radius: 6px;
+                background-color: #F9FAFB;
+                font-size: 14px;
+                color: #111827;
+            }
+            QLineEdit:focus {
+                border: 2px solid #22C55E;
+                background-color: #FFFFFF;
+            }
+        """)
+        
+        shadow = QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(15)
+        shadow.setXOffset(0)
+        shadow.setYOffset(4)
+        shadow.setColor(QColor(0, 0, 0, 15))
+        card.setGraphicsEffect(shadow)
+        
+        card_layout = QVBoxLayout(card)
+        card_layout.setContentsMargins(25, 25, 25, 25)
+        card_layout.setSpacing(15)
 
-        self.scroll_layout.addWidget(card_nama)
-        self.scroll_layout.addWidget(card_pass)
-        self.scroll_layout.addWidget(card_conf)
+        # 1. Input Nama
+        lbl_nama = QLabel("Nama Baru:")
+        self.inp_nama = QLineEdit()
+        self.inp_nama.setPlaceholderText("Masukkan nama baru...")
 
-        self.scroll_layout.addSpacing(10)
+        # 2. Input Kata Sandi
+        lbl_pass = QLabel("Kata Sandi Baru:")
+        self.inp_pass = QLineEdit()
+        self.inp_pass.setEchoMode(QLineEdit.Password)
+        self.inp_pass.setPlaceholderText("Kosongkan jika tidak diganti")
 
-        # BUTTON SIMPAN
-        self.btn_simpan = QPushButton("Simpan")
-        self.btn_simpan.setFixedHeight(55)
+        # 3. Input Konfirmasi Kata Sandi
+        lbl_conf = QLabel("Konfirmasi Kata Sandi Baru:")
+        self.inp_conf_pass = QLineEdit()
+        self.inp_conf_pass.setEchoMode(QLineEdit.Password)
+        self.inp_conf_pass.setPlaceholderText("Kosongkan jika tidak diganti")
+
+        # 4. Tombol Simpan
+        self.btn_simpan = QPushButton("Simpan Perubahan")
         self.btn_simpan.setCursor(Qt.PointingHandCursor)
+        self.btn_simpan.setFixedSize(200, 45)
         self.btn_simpan.setStyleSheet("""
             QPushButton {
-                background-color: #22C55E; 
-                color: white; 
-                border-radius: 15px; 
-                font-size: 16px; 
+                background-color: #22C55E;
+                color: white;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: bold;
+                border: none;
             }
-            QPushButton:hover { background-color: #16a34a; }
+            QPushButton:hover {
+                background-color: #16A34A;
+            }
         """)
-        shadow_btn = QGraphicsDropShadowEffect(self)
-        shadow_btn.setBlurRadius(15)
-        shadow_btn.setXOffset(0)
-        shadow_btn.setYOffset(4)
-        shadow_btn.setColor(QColor(0, 0, 0, 20))
-        self.btn_simpan.setGraphicsEffect(shadow_btn)
         self.btn_simpan.clicked.connect(self.on_simpan_clicked)
-        self.scroll_layout.addWidget(self.btn_simpan)
 
-        # BUTTON KELUAR AKUN
+        card_layout.addWidget(lbl_nama)
+        card_layout.addWidget(self.inp_nama)
+        card_layout.addWidget(lbl_pass)
+        card_layout.addWidget(self.inp_pass)
+        card_layout.addWidget(lbl_conf)
+        card_layout.addWidget(self.inp_conf_pass)
+
+        btn_layout = QHBoxLayout()
+        btn_layout.setContentsMargins(0, 15, 0, 0)
+        btn_layout.addStretch()
+        btn_layout.addWidget(self.btn_simpan)
+        
+        card_layout.addLayout(btn_layout)
+        
+        self.scroll_layout.addWidget(card)
+
+        # --- BUTTON KELUAR AKUN ---
         self.btn_logout = QPushButton(" Keluar Akun")
         icon_logout_path = os.path.join(BASE_DIR, "assets", "icons", "logout.svg")
         self.btn_logout.setIcon(create_colored_icon(icon_logout_path, QColor(255, 255, 255), 24))
         self.btn_logout.setIconSize(QSize(24, 24))
-        self.btn_logout.setFixedHeight(55)
+        self.btn_logout.setFixedHeight(50)
         self.btn_logout.setCursor(Qt.PointingHandCursor)
         self.btn_logout.setStyleSheet("""
             QPushButton {
-                background-color: #FF0000; 
+                background-color: #EF4444; 
                 color: white; 
-                border-radius: 15px; 
-                font-size: 16px; 
+                border-radius: 8px; 
+                font-size: 15px;
+                font-weight: bold; 
+                border: none;
             }
             QPushButton:hover { background-color: #DC2626; }
         """)
+        
         shadow_logout = QGraphicsDropShadowEffect(self)
         shadow_logout.setBlurRadius(15)
         shadow_logout.setXOffset(0)
         shadow_logout.setYOffset(4)
-        shadow_logout.setColor(QColor(0, 0, 0, 20))
+        shadow_logout.setColor(QColor(0, 0, 0, 15))
         self.btn_logout.setGraphicsEffect(shadow_logout)
+        
         self.btn_logout.clicked.connect(lambda: self.logout_clicked.emit())
         self.scroll_layout.addWidget(self.btn_logout)
 

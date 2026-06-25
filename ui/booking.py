@@ -228,8 +228,6 @@ class BookingPage(QWidget):
             self.icon_user.setPixmap(user_pixmap.scaled(22, 22, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.icon_user.setFixedSize(22, 22)
 
-        # Ikon lonceng dihapus dari sini
-
         user_layout.addWidget(self.user_name)
         user_layout.addWidget(self.icon_user)
 
@@ -266,7 +264,7 @@ class BookingPage(QWidget):
         # Container untuk kartu lapangan dinamis
         self.fields_container = QWidget()
         self.fields_layout = QVBoxLayout(self.fields_container)
-        self.fields_layout.setContentsMargins(0, 0, 0, 0)
+        self.fields_layout.setContentsMargins(0, 0, 0, 25)
         self.fields_layout.setSpacing(25)
         content_layout.addWidget(self.fields_container)
 

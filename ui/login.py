@@ -109,29 +109,29 @@ class MainWindow(QWidget):
         self.header_layout.addWidget(self.subtitle_label)
         self.card_layout.addLayout(self.header_layout)
 
-        # 3. Form Input Email (Diperbaiki jaraknya)
-        self.email_layout = QVBoxLayout()
-        self.email_layout.setSpacing(8) # Jarak rapat antara label dan input
+        # 3. Form Input Email
+        self.nama_layout = QVBoxLayout()
+        self.nama_layout.setSpacing(8)
         
-        self.email_label = QLabel("Email")
-        self.email_label.setObjectName("fieldLabel")
-        self.email_input = QLineEdit()
-        self.email_input.setPlaceholderText("Masukkan email Anda")
-        self.email_input.setFixedHeight(45)
+        self.nama_label = QLabel("Nama")
+        self.nama_label.setObjectName("fieldLabel")
+        self.nama_input = QLineEdit()
+        self.nama_input.setPlaceholderText("Masukkan Nama")
+        self.nama_input.setFixedHeight(45)
 
-        self.email_layout.addWidget(self.email_label)
-        self.email_layout.addWidget(self.email_input)
-        self.card_layout.addLayout(self.email_layout)
+        self.nama_layout.addWidget(self.nama_label)
+        self.nama_layout.addWidget(self.nama_input)
+        self.card_layout.addLayout(self.nama_layout)
 
         # 4. Form Input Password (Diperbaiki jaraknya)
         self.pass_layout = QVBoxLayout()
-        self.pass_layout.setSpacing(8) # Jarak rapat antara label dan input
+        self.pass_layout.setSpacing(8)
         
-        self.pass_label = QLabel("Password")
+        self.pass_label = QLabel("Kata Sandi")
         self.pass_label.setObjectName("fieldLabel")
         
         self.pass_input = QLineEdit()
-        self.pass_input.setPlaceholderText("••••••••")
+        self.pass_input.setPlaceholderText("Masukkan Kata Sandi")
         self.pass_input.setEchoMode(QLineEdit.Password)
         self.pass_input.setFixedHeight(45)
 
@@ -169,21 +169,21 @@ class MainWindow(QWidget):
 
     # --- FUNGSI LOGIKA DATABASE ---
     def proses_login(self):
-        email = self.email_input.text().strip()
+        nama = self.nama_input.text().strip()
         password = self.pass_input.text().strip()
 
-        if not email or not password:
+        if not nama or not password:
             QMessageBox.warning(self, "Peringatan", "Email dan Password tidak boleh kosong!")
             return
 
         # Memanggil fungsi validasi dari db_manager
-        user_data = validate_login(email, password)
+        user_data = validate_login(nama, password)
 
         if user_data:
             nama_user = user_data[0]
             role_user = user_data[1] # Bisa digunakan nanti jika butuh routing ke Dashboard Admin
             
-            self.email_input.clear()
+            self.nama_input.clear()
             self.pass_input.clear()
             
             # Emit signal dengan membawa nama user dan role

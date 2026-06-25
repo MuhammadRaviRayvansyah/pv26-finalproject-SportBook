@@ -22,7 +22,8 @@ def create_colored_icon(icon_path, color, size=24):
     return QIcon()
 
 class AdminSidebar(QFrame):
-    nav_changed = Signal(str) # "dashboard", "fields", "bookings", "categories", "logout"
+    # Memperbarui daftar signal yang dipancarkan
+    nav_changed = Signal(str) # "dashboard", "bookings", "settings", "logout"
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -67,16 +68,14 @@ class AdminSidebar(QFrame):
         logo_label.setContentsMargins(0, 0, 0, 30)
         layout.addWidget(logo_label)
 
-        # Menu Buttons
+        # Menu Buttons (Telah Disesuaikan)
         self.btn_dashboard = self._create_nav_btn("Dashboard", "home.svg", "dashboard")
-        self.btn_fields = self._create_nav_btn("Kelola Lapangan", "schedule.svg", "fields")
         self.btn_bookings = self._create_nav_btn("Daftar Pesanan", "history.svg", "bookings")
-        self.btn_categories = self._create_nav_btn("Kelola Kategori", "tag.svg", "categories")
+        self.btn_settings = self._create_nav_btn("Pengaturan", "gear.svg", "settings")
         
         layout.addWidget(self.btn_dashboard)
-        layout.addWidget(self.btn_fields)
         layout.addWidget(self.btn_bookings)
-        layout.addWidget(self.btn_categories)
+        layout.addWidget(self.btn_settings)
         
         layout.addStretch()
 
@@ -84,11 +83,16 @@ class AdminSidebar(QFrame):
         self.btn_logout = self._create_nav_btn("Keluar", "logout.svg", "logout", is_logout=True)
         layout.addWidget(self.btn_logout)
 
-        self.buttons = [self.btn_dashboard, self.btn_fields, self.btn_bookings, self.btn_categories]
+        # Memperbarui daftar tombol aktif
+        self.buttons = [self.btn_dashboard, self.btn_bookings, self.btn_settings]
+        
+        # Panggilan ini akan mengatur warna ikon Dashboard menjadi hijau saat aplikasi pertama kali dimuat
         self.set_active("dashboard")
 
     def _create_nav_btn(self, text, icon_name, nav_target, is_logout=False):
         btn = QPushButton(f"  {text}")
+        
+        # Warna ikon default diatur di sini (akan ditimpa secara dinamis oleh set_active nantinya)
         icon_path = os.path.join(BASE_DIR, "assets", "icons", icon_name)
         color = QColor("#EF4444") if is_logout else QColor("#4B5563")
         btn.setIcon(create_colored_icon(icon_path, color, 20))
@@ -108,17 +112,35 @@ class AdminSidebar(QFrame):
         self.nav_changed.emit(target)
 
     def set_active(self, target):
+        # 1. Bersihkan state aktif sebelumnya
         for b in self.buttons:
             b.setObjectName("")
         
+        # 2. Tentukan tombol mana yang sedang aktif
         active_btn = None
         if target == "dashboard": active_btn = self.btn_dashboard
-        elif target == "fields": active_btn = self.btn_fields
         elif target == "bookings": active_btn = self.btn_bookings
-        elif target == "categories": active_btn = self.btn_categories
+        elif target == "settings": active_btn = self.btn_settings
         
         if active_btn:
             active_btn.setObjectName("activeNav")
         
-        # Refresh stylesheet to apply objectName changes
+        # --- PERBAIKAN: PEWARNAAN IKON DINAMIS ---
+        
+        warna_aktif = QColor("#16A34A")  
+        warna_biasa = QColor("#4B5563")  
+        
+        # Update ikon Dashboard
+        path_dash = os.path.join(BASE_DIR, "assets", "icons", "home.svg")
+        self.btn_dashboard.setIcon(create_colored_icon(path_dash, warna_aktif if target == "dashboard" else warna_biasa, 20))
+        
+        # Update ikon Daftar Pesanan
+        path_book = os.path.join(BASE_DIR, "assets", "icons", "history.svg")
+        self.btn_bookings.setIcon(create_colored_icon(path_book, warna_aktif if target == "bookings" else warna_biasa, 20))
+        
+        # Update ikon Pengaturan
+        path_settings = os.path.join(BASE_DIR, "assets", "icons", "gear.svg")
+        self.btn_settings.setIcon(create_colored_icon(path_settings, warna_aktif if target == "settings" else warna_biasa, 20))
+        
+        # Refresh stylesheet agar perubahan objectName segera diterapkan
         self.setStyleSheet(self.styleSheet())

@@ -1,7 +1,5 @@
 import os
-from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
-                             QLineEdit, QPushButton, QFrame, QGraphicsDropShadowEffect,
-                             QSizePolicy, QMessageBox)
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QFrame, QGraphicsDropShadowEffect,QMessageBox)
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QColor, QPainter
 from database.db_manager import register_user
@@ -96,6 +94,7 @@ class RegisterPage(QWidget):
         self.nama_label = QLabel("Nama")
         self.nama_label.setObjectName("fieldLabel")
         self.nama_input = QLineEdit()
+        self.nama_input.setPlaceholderText("Masukkan Nama")
         self.nama_input.setFixedHeight(42)
         
         nama_group.addWidget(self.nama_label)
@@ -109,6 +108,7 @@ class RegisterPage(QWidget):
         self.email_label = QLabel("Email")
         self.email_label.setObjectName("fieldLabel")
         self.email_input = QLineEdit()
+        self.email_input.setPlaceholderText("Masukkan Email")
         self.email_input.setFixedHeight(42)
         
         email_group.addWidget(self.email_label)
@@ -119,10 +119,10 @@ class RegisterPage(QWidget):
         pass_group = QVBoxLayout()
         pass_group.setSpacing(5) 
         
-        self.pass_label = QLabel("Password")
+        self.pass_label = QLabel("Kata Sandi")
         self.pass_label.setObjectName("fieldLabel")
         self.pass_input = QLineEdit()
-        self.pass_input.setPlaceholderText("••••••••")
+        self.pass_input.setPlaceholderText("Masukkan Kata Sandi")
         self.pass_input.setEchoMode(QLineEdit.Password)
         self.pass_input.setFixedHeight(42)
         
