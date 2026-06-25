@@ -156,10 +156,11 @@ if __name__ == "__main__":
         except AttributeError: pass
 
     def buka_halaman_pengaturan(*args):
-        pengaturan_page.inp_nama.clear()
-        pengaturan_page.inp_pass.clear()
-        pengaturan_page.inp_conf_pass.clear()
+        # 1. Panggil load_data dengan nama user yang sedang aktif
+        nama_aktif = current_session["nama"]
+        pengaturan_page.load_data(nama_aktif)
         
+        # 2. Sisanya tetap sama
         stacked_widget.setCurrentWidget(pengaturan_page)
         main_window.setWindowTitle("SportBook - Pengaturan Akun")
         try: pengaturan_page.scroll.verticalScrollBar().setValue(0)
@@ -181,23 +182,29 @@ if __name__ == "__main__":
         buka_halaman_login()
 
     def simpan_pengaturan(nama_baru, pwd, conf_pwd):
+        old_nama = current_session["nama"]
+        
+        final_nama = nama_baru.strip()
+
         if pwd != "" or conf_pwd != "":
             if pwd != conf_pwd:
                 QMessageBox.warning(pengaturan_page, "Peringatan", "Konfirmasi Kata Sandi tidak cocok!")
                 return
+            if len(pwd) < 6:
+                QMessageBox.warning(pengaturan_page, "Peringatan", "Password minimal 6 karakter!")
+                return
         
-        old_nama = current_session["nama"]
-        final_nama = nama_baru.strip() if nama_baru.strip() != "" else old_nama
-
+        # Update ke database
         update_user_profile(old_nama, final_nama, pwd)
         current_session["nama"] = final_nama
         
+        # Update UI
         home_page.user_name.setText(final_nama)
         home_page.h_title.setText(f"Hallo, <b style='color:#22C55E;'>{final_nama}!</b>")
         booking_page.user_name.setText(final_nama)
         history_page.user_name.setText(final_nama)
         
-        QMessageBox.information(pengaturan_page, "Sukses", "Perubahan profil berhasil disimpan secara permanen!")
+        QMessageBox.information(pengaturan_page, "Sukses", "Profil berhasil diperbarui!")
         buka_halaman_beranda()
 
     def proses_update_admin(nama_baru, sandi_baru):

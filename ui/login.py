@@ -100,7 +100,7 @@ class MainWindow(QWidget):
         self.title_label.setObjectName("titleLabel")
         self.title_label.setAlignment(Qt.AlignCenter)
         
-        self.subtitle_label = QLabel("Masukkan email dan password untuk akses akun Anda")
+        self.subtitle_label = QLabel("Masukkan nama dan password untuk akses akun Anda")
         self.subtitle_label.setObjectName("subtitleLabel")
         self.subtitle_label.setAlignment(Qt.AlignCenter)
         self.subtitle_label.setWordWrap(True)
@@ -109,7 +109,7 @@ class MainWindow(QWidget):
         self.header_layout.addWidget(self.subtitle_label)
         self.card_layout.addLayout(self.header_layout)
 
-        # 3. Form Input Email
+        # 3. Form Input Nama
         self.nama_layout = QVBoxLayout()
         self.nama_layout.setSpacing(8)
         
@@ -173,20 +173,27 @@ class MainWindow(QWidget):
         password = self.pass_input.text().strip()
 
         if not nama or not password:
-            QMessageBox.warning(self, "Peringatan", "Email dan Password tidak boleh kosong!")
+            QMessageBox.warning(self, "Peringatan", "Nama dan Password wajib diisi!")
             return
+        
+        if len(password) < 6:
+            QMessageBox.warning(self, "Peringatan", "Password minimal 6 karakter!")
+            return
+        try:
+            user_data = validate_login(nama, password)
 
-        # Memanggil fungsi validasi dari db_manager
-        user_data = validate_login(nama, password)
-
-        if user_data:
-            nama_user = user_data[0]
-            role_user = user_data[1] # Bisa digunakan nanti jika butuh routing ke Dashboard Admin
-            
-            self.nama_input.clear()
-            self.pass_input.clear()
-            
-            # Emit signal dengan membawa nama user dan role
-            self.login_successful.emit(nama_user, role_user)
-        else:
-            QMessageBox.critical(self, "Gagal", "Email atau Password salah!")
+            if user_data:
+                nama_user, role_user = user_data
+                
+                # Bersihkan form
+                self.nama_input.clear()
+                self.pass_input.clear()
+                
+                # Kirim sinyal berhasil
+                self.login_successful.emit(nama_user, role_user)
+            else:
+                QMessageBox.critical(self, "Login Gagal", "Nama atau Password salah!")
+                self.pass_input.clear()
+                
+        except Exception as e:
+            QMessageBox.critical(self, "Error Sistem", f"Terjadi kesalahan koneksi database: {str(e)}")

@@ -144,8 +144,18 @@ class AdminPengaturan(QWidget):
         nama_baru = self.input_nama.text().strip()
         sandi_baru = self.input_sandi.text().strip()
         
+        # Validasi
         if not nama_baru:
-            QMessageBox.warning(self, "Peringatan", "Kolom nama tidak boleh kosong!")
+            QMessageBox.warning(self, "Peringatan", "Nama tidak boleh kosong!")
+            return
+        if sandi_baru and len(sandi_baru) < 6:
+            QMessageBox.warning(self, "Peringatan", "Kata sandi minimal 6 karakter!")
             return
             
-        self.save_clicked.emit(nama_baru, sandi_baru)
+        # Konfirmasi Tunggal (Poin no 5 terpenuhi)
+        reply = QMessageBox.question(self, "Konfirmasi", "Simpan perubahan profil?", 
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        
+        if reply == QMessageBox.Yes:
+            self.save_clicked.emit(nama_baru, sandi_baru)
+            # Pesan sukses setelah database berhasil diupdate bisa dipanggil di main.py

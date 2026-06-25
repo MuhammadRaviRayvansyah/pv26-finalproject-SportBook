@@ -1,4 +1,5 @@
 import os
+import re
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QFrame, QGraphicsDropShadowEffect,QMessageBox)
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QColor, QPainter
@@ -163,19 +164,34 @@ class RegisterPage(QWidget):
         email = self.email_input.text().strip()
         password = self.pass_input.text().strip()
 
-        # Validasi Kosong
+        # 1. Validasi Field Kosong
         if not nama or not email or not password:
             QMessageBox.warning(self, "Peringatan", "Semua kolom wajib diisi!")
             return
 
-        # Memanggil fungsi dari db_manager
-        sukses, pesan = register_user(nama, email, password)
+        # 2. Validasi Format Email menggunakan Regex
+        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        if not re.match(email_regex, email):
+            QMessageBox.warning(self, "Peringatan", "Format email tidak valid!")
+            return
 
-        if sukses:
-            QMessageBox.information(self, "Berhasil", pesan)
-            self.nama_input.clear()
-            self.email_input.clear()
-            self.pass_input.clear()
-            self.register_successful.emit()
-        else:
-            QMessageBox.critical(self, "Gagal", pesan)
+        # 3. Validasi Panjang Password (Keamanan)
+        if len(password) < 6:
+            QMessageBox.warning(self, "Peringatan", "Password minimal 6 karakter!")
+            return
+
+        # 4. Try-Except untuk mencegah crash saat proses database
+        try:
+            sukses, pesan = register_user(nama, email, password)
+
+            if sukses:
+                QMessageBox.information(self, "Berhasil", pesan)
+                self.nama_input.clear()
+                self.email_input.clear()
+                self.pass_input.clear()
+                self.register_successful.emit()
+            else:
+                QMessageBox.critical(self, "Gagal", pesan)
+                
+        except Exception as e:
+            QMessageBox.critical(self, "Error Sistem", f"Terjadi kesalahan saat menyimpan data: {str(e)}")

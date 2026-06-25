@@ -1,8 +1,8 @@
 import os
-from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QMessageBox, 
                                QPushButton, QFrame, QScrollArea, QGraphicsDropShadowEffect, QToolButton, QLineEdit, QSizePolicy)
 from PySide6.QtCore import Qt, Signal, QSize
-from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
+from PySide6.QtGui import QPixmap, QPainter, QColor, QIcon
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -259,5 +259,30 @@ class PengaturanPage(QWidget):
         self.main_layout.addWidget(self.scroll)
         self.main_layout.addWidget(self.bot_nav)
 
+    def load_data(self, nama_sekarang):
+        # Mengisi input nama dengan nama user saat ini
+        self.inp_nama.setText(nama_sekarang)
+        # Mengosongkan field password agar user tidak bingung
+        self.inp_pass.clear()
+        self.inp_conf_pass.clear()
+
     def on_simpan_clicked(self):
-        self.save_clicked.emit(self.inp_nama.text(), self.inp_pass.text(), self.inp_conf_pass.text())
+        # Ambil nilai saat ini
+        nama = self.inp_nama.text().strip()
+        pwd = self.inp_pass.text().strip()
+        conf_pwd = self.inp_conf_pass.text().strip()
+
+        # Jika nama kosong, kita tidak mengirimkan "" kosong ke database
+        # Kita kirimkan indikator bahwa nama tidak berubah
+        nama_final = nama if nama != "" else "KEEP_OLD_NAME"
+
+        # Validasi Password (hanya jika diisi)
+        if pwd or conf_pwd:
+            if len(pwd) < 6:
+                QMessageBox.warning(self, "Peringatan", "Password minimal 6 karakter!")
+                return
+            if pwd != conf_pwd:
+                QMessageBox.warning(self, "Peringatan", "Konfirmasi kata sandi tidak cocok!")
+                return
+
+        self.save_clicked.emit(nama_final, pwd, conf_pwd)
