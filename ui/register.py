@@ -10,11 +10,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 class BackgroundFrame(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
-        # Nama file asset tetap menggunakan nama awal: stadium_bg.jpg
         self.bg_path = os.path.join(BASE_DIR, "assets", "images", "stadium_bg.jpg")
         self.pixmap = QPixmap(self.bg_path)
 
     def paintEvent(self, event):
+        super().paintEvent(event)
         painter = QPainter(self)
         if not self.pixmap.isNull():
             scaled = self.pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
@@ -138,7 +138,6 @@ class RegisterPage(QWidget):
         self.btn_submit.setFixedHeight(48)
         self.btn_submit.setCursor(Qt.PointingHandCursor)
         self.card_layout.addWidget(self.btn_submit)
-        # Hubungkan tombol daftar ke fungsi proses_pendaftaran
         self.btn_submit.clicked.connect(self.proses_pendaftaran)
 
         # Footer
@@ -175,12 +174,11 @@ class RegisterPage(QWidget):
             QMessageBox.warning(self, "Peringatan", "Format email tidak valid!")
             return
 
-        # 3. Validasi Panjang Password (Keamanan)
+        # 3. Validasi Panjang Password 
         if len(password) < 6:
             QMessageBox.warning(self, "Peringatan", "Password minimal 6 karakter!")
             return
 
-        # 4. Try-Except untuk mencegah crash saat proses database
         try:
             sukses, pesan = register_user(nama, email, password)
 

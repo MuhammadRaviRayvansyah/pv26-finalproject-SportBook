@@ -1,12 +1,11 @@
 import sys
 import os
 from datetime import datetime
-from PySide6.QtWidgets import (QApplication, QStackedWidget, QMessageBox, QWidget, 
-                               QHBoxLayout, QMainWindow, QLabel)
+from PySide6.QtWidgets import (QApplication, QStackedWidget, QMessageBox, QWidget, QHBoxLayout, QMainWindow, QLabel)
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 
-# Import Semua Halaman UI (User)
+# Import Semua Halaman UI User
 from ui.login import MainWindow as LoginPage
 from ui.register import RegisterPage
 from ui.beranda import HomePage
@@ -17,16 +16,14 @@ from ui.notif_sukses import NotifSuksesPage
 from ui.history import HistoryPage 
 from ui.pengaturan import PengaturanPage 
 
-# Import Semua Halaman UI (Admin)
+# Import Semua Halaman UI Admin
 from ui.admin_sidebar import AdminSidebar
 from ui.admin_dashboard import AdminDashboard
 from ui.admin_pengaturan import AdminPengaturan
 from ui.admin_manage_bookings import AdminManageBookings
 
 # Import Fungsi Database
-from database.db_manager import (init_db, get_booked_slots, save_booking, 
-                                   get_user_bookings, delete_user_booking, update_user_profile,
-                                   get_all_fields)
+from database.db_manager import (init_db, get_booked_slots, save_booking, get_user_bookings, delete_user_booking, update_user_profile, get_all_fields)
 
 def load_stylesheet(app, file_path):
     if os.path.exists(file_path):
@@ -40,12 +37,12 @@ if __name__ == "__main__":
     style_path = os.path.join(os.path.dirname(__file__), "styles", "style.qss")
     load_stylesheet(app, style_path)
     
-    # --- 1. INISIALISASI BINGKAI UTAMA (MAIN WINDOW) ---
+    # INISIALISASI BINGKAI UTAMA MAIN WINDOW
     main_window = QMainWindow()
     main_window.setMinimumSize(800, 500)
     main_window.resize(1000, 600)
     
-    # --- 2. INISIALISASI MENU BAR ---
+    # INISIALISASI MENU BAR
     menu_bar = main_window.menuBar()
     
     # Menu File -> Exit
@@ -60,17 +57,17 @@ if __name__ == "__main__":
     about_action.triggered.connect(lambda: QMessageBox.information(main_window, "Tentang", "Aplikasi SportBook"))
     help_menu.addAction(about_action)
 
-    # --- 3. INISIALISASI STATUS BAR ---
+    # INISIALISASI STATUS BAR
     status_bar = main_window.statusBar()
     lbl_status = QLabel("Kelompok 10: Muhammad Ravi Rayvansyah - F1D02410078 | Yudhi Fajar Pratama - F1D02310142 | M. Danuarta Wiraguna - F1D02310124")
     lbl_status.setStyleSheet("color: #4B5563; font-weight: bold; margin-left: 10px;")
     status_bar.addWidget(lbl_status)
 
-    # --- 4. KONTEN UTAMA (CENTRAL WIDGET) ---
+    # KONTEN UTAMA CENTRAL WIDGET
     stacked_widget = QStackedWidget()
     main_window.setCentralWidget(stacked_widget)
     
-    # --- INISIALISASI HALAMAN USER ---
+    # INISIALISASI HALAMAN USER
     login_page = LoginPage()
     register_page = RegisterPage()
     home_page = HomePage()
@@ -91,7 +88,7 @@ if __name__ == "__main__":
     stacked_widget.addWidget(history_page)  
     stacked_widget.addWidget(pengaturan_page)  
 
-    # --- INISIALISASI HALAMAN ADMIN ---
+    # INISIALISASI HALAMAN ADMIN
     admin_main_page = QWidget()
     admin_main_layout = QHBoxLayout(admin_main_page)
     admin_main_layout.setContentsMargins(0, 0, 0, 0)
@@ -120,7 +117,7 @@ if __name__ == "__main__":
         "temp_harga": 0
     }
     
-    # --- FUNGSI-FUNGSI NAVIGASI HALAMAN ---
+    # FUNGSI-FUNGSI NAVIGASI HALAMAN
     def buka_halaman_register():
         stacked_widget.setCurrentWidget(register_page)
         main_window.setWindowTitle("SportBook - Register")
@@ -173,7 +170,7 @@ if __name__ == "__main__":
         stacked_widget.setCurrentWidget(admin_main_page)
         main_window.setWindowTitle("SportBook - Admin Panel")
         
-    # --- FUNGSI LOGIKA DAN TRANSAKSI ---
+    # FUNGSI LOGIKA DAN TRANSAKSI
     def proses_logout():
         current_session["nama"] = ""
         current_session["temp_lapangan"] = ""
@@ -264,7 +261,7 @@ if __name__ == "__main__":
         else:
             QMessageBox.critical(pembayaran_page, "Error", "Gagal menyimpan jadwal ke database.")
 
-    # --- LOGIKA NAVIGASI ADMIN ---
+    # LOGIKA NAVIGASI ADMIN
     def navigasi_admin(target):
         if target == "dashboard":
             admin_dashboard.refresh_data()
@@ -278,7 +275,7 @@ if __name__ == "__main__":
         elif target == "logout":
             proses_logout()
     
-    # --- HUBUNGAN SIGNAL DAN SLOT (NAVIGASI & AKSI) ---
+    # HUBUNGAN SIGNAL DAN SLOT NAVIGASI & AKSI
     login_page.footer_link.clicked.connect(buka_halaman_register)
     register_page.f_link.clicked.connect(buka_halaman_login)
     login_page.login_successful.connect(saat_login_berhasil)
@@ -318,7 +315,6 @@ if __name__ == "__main__":
 
     history_page.request_delete.connect(hapus_riwayat)
     
-    home_page.request_book.connect(buka_detail_lapangan)
     booking_page.request_book.connect(buka_detail_lapangan)
     
     detail_page.go_back.connect(buka_halaman_booking)
@@ -329,11 +325,11 @@ if __name__ == "__main__":
     pembayaran_page.confirm_payment.connect(proses_pembayaran_final)
     sukses_page.back_to_home.connect(buka_halaman_beranda)
 
-    # --- SIGNAL ADMIN ---
+    # SIGNAL ADMIN
     admin_sidebar.nav_changed.connect(navigasi_admin)
     admin_pengaturan_page.save_clicked.connect(proses_update_admin)
     
-    # --- PENAMPILAN WINDOW ---
+    # PENAMPILAN WINDOW
     buka_halaman_login()
     main_window.show()
     sys.exit(app.exec())

@@ -1,140 +1,96 @@
-# Mengimpor modul os untuk berinteraksi dengan sistem operasi, khususnya untuk manajemen path (jalur file)
 import os
-
-# Mengimpor komponen-komponen antarmuka pengguna (UI) dari PySide6
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QFrame, QScrollArea, QSizePolicy, 
                              QGraphicsDropShadowEffect, QToolButton)
-from PySide6.QtCore import Qt, QSize, Signal
+from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
 
-# Menentukan direktori dasar (BASE_DIR) dari proyek dengan mengambil dua tingkat direktori ke atas dari file ini
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Fungsi utilitas untuk membuat ikon yang warnanya dapat disesuaikan (berguna untuk ikon SVG)
 def create_colored_icon(icon_path, color, size=28):
-
-    # Memuat gambar dari jalur file yang diberikan
     pixmap = QPixmap(icon_path)
     
-    # Memeriksa apakah gambar berhasil dimuat
     if not pixmap.isNull():
-        # Mengubah ukuran gambar sesuai parameter 'size' dengan menjaga rasio aspek dan memperhalus tepiannya
         pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        # Membuat kanvas (pixmap) baru dengan ukuran yang sama untuk diwarnai
         colored_pixmap = QPixmap(pixmap.size())
-        # Mengisi kanvas dengan warna transparan
         colored_pixmap.fill(Qt.transparent)
-        
-        # Menginisialisasi QPainter untuk menggambar di atas kanvas baru
+
         painter = QPainter(colored_pixmap)
-        # Mengaktifkan antialiasing agar gambar tidak bergerigi
-        painter.setRenderHint(QPainter.Antialiasing)
-        # Menggambar gambar asli ke kanvas
         painter.drawPixmap(0, 0, pixmap)
+
         # Mengatur mode komposisi agar warna yang diisi hanya menimpa bagian gambar yang tidak transparan
         painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-        # Mengisi seluruh kanvas dengan warna yang diinginkan (parameter 'color')
         painter.fillRect(colored_pixmap.rect(), color)
-        # Mengakhiri proses menggambar
         painter.end()
-        
-        # Mengembalikan gambar yang sudah diwarnai dalam bentuk QIcon
         return QIcon(colored_pixmap)
-    # Mengembalikan QIcon kosong jika gambar gagal dimuat
     return QIcon()
 
-# Kelas untuk membuat komponen banner pahlawan (Hero Section) di bagian atas beranda
 class HeroFrame(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
-        # Mengatur nama objek untuk keperluan styling (QSS)
         self.setObjectName("heroSection")
-        # Mengatur tinggi tetap sebesar 320 piksel
         self.setFixedHeight(320)
-        # Mendefinisikan jalur file gambar latar belakang (background stadium)
         self.bg_path = os.path.join(BASE_DIR, "assets", "images", "stadium_bg.jpg")
         self.pixmap = QPixmap(self.bg_path)
-        
-        # Memberikan efek bayangan (drop shadow) pada frame Hero
+
         shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(20) # Tingkat keburaman bayangan
-        shadow.setXOffset(0)     # Pergeseran bayangan sumbu X
-        shadow.setYOffset(6)     # Pergeseran bayangan sumbu Y
-        shadow.setColor(QColor(0, 0, 0, 45)) # Warna bayangan (Hitam transparan)
+        shadow.setBlurRadius(20) 
+        shadow.setXOffset(0)     
+        shadow.setYOffset(6)     
+        shadow.setColor(QColor(0, 0, 0, 45)) 
         self.setGraphicsEffect(shadow)
 
-    # Memodifikasi cara frame digambar untuk memberikan efek sudut melengkung dan background gambar
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        
-        # Jika gambar latar belakang berhasil dimuat
+        super().paintEvent(event)
+
         if not self.pixmap.isNull():
-            # Menskalakan gambar agar memenuhi ukuran frame
             scaled = self.pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
-            
-            # Membuat jalur (path) dengan sudut melengkung sebesar 24 piksel
+
             path = QPainterPath()
             path.addRoundedRect(0, 0, self.width(), self.height(), 24, 24)
-            # Memotong (clip) area gambar agar mengikuti bentuk sudut melengkung
+
+            # Memotong area gambar agar mengikuti bentuk sudut melengkung
             painter.setClipPath(path)
-            
-            # Menghitung posisi X dan Y agar gambar berada tepat di tengah (center crop)
+
             x = (self.width() - scaled.width()) // 2
             y = (self.height() - scaled.height()) // 2
-            # Menggambar gambar latar belakang
             painter.drawPixmap(x, y, scaled)
         else:
-            # Jika gambar tidak ditemukan, gunakan warna abu-abu sebagai fallback dengan sudut melengkung
             painter.setBrush(QColor("#e5e7eb"))
             painter.drawRoundedRect(0, 0, self.width(), self.height(), 24, 24)
 
-# Kelas widget khusus untuk merender gambar lapangan dengan sudut melengkung
 class CardImage(QWidget):
     def __init__(self, img_path, parent=None):
         super().__init__(parent)
-        # Mengatur tinggi tetap gambar menjadi 240 piksel
         self.setFixedHeight(240)
-        # Mengatur ukuran agar lebarnya melar mengikuti kontainer, tapi tingginya tetap
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        # Memuat gambar dari jalur yang diberikan
         self.pixmap = QPixmap(img_path)
 
-    # Memodifikasi cara gambar dirender agar memiliki sudut melengkung
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
+        super().paintEvent(event)
         
         if not self.pixmap.isNull():
-            # Menskalakan gambar
             scaled = self.pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
-            
-            # Membuat mask dengan sudut melengkung sebesar 14 piksel
+
             path = QPainterPath()
             path.addRoundedRect(0, 0, self.width(), self.height(), 14, 14)
             painter.setClipPath(path)
-            
-            # Menempatkan gambar di tengah (center crop)
+
             x = (self.width() - scaled.width()) // 2
             y = (self.height() - scaled.height()) // 2
             painter.drawPixmap(x, y, scaled)
         else:
-            # Fallback warna abu-abu jika gambar tidak ditemukan
             painter.setBrush(QColor("#e5e7eb"))
             painter.drawRoundedRect(0, 0, self.width(), self.height(), 14, 14)
 
-# Kelas untuk komponen Kartu Lapangan (menampilkan info detail lapangan di beranda)
 class FieldCard(QFrame):
-    # Sinyal kustom yang dikirim saat tombol booking pada kartu ini diklik
-    request_book = Signal(str, str, int)
-
     def __init__(self, img_name, title, price_str, parent=None):
         super().__init__(parent)
         self.setObjectName("fieldCard")
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
-        # Membersihkan string harga (menghapus titik) dan mengonversinya ke integer
         self.harga_int = int(price_str.replace(".", ""))
         
         # Menambahkan efek bayangan pada kartu
@@ -172,7 +128,6 @@ class FieldCard(QFrame):
         loc_layout.setSpacing(8)
         loc_icon = QLabel()
         icon_loc_path = os.path.join(BASE_DIR, "assets", "icons", "location.svg")
-        # Memberi warna ikon lokasi
         loc_icon.setPixmap(create_colored_icon(icon_loc_path, QColor("#111827"), 18).pixmap(20, 20))
         loc_icon.setFixedSize(20, 20)
         loc_icon.setAlignment(Qt.AlignCenter)
@@ -233,15 +188,13 @@ class FieldCard(QFrame):
         jam_layout.addStretch()
         info_layout.addLayout(jam_layout)
 
-        # Menambahkan area informasi ke layout utama kartu
         main_layout.addLayout(info_layout)
 
-        # Bagian 3: Area Harga dan Tombol Booking
+        # Bagian 3: Area Harga (Tanpa Tombol Booking)
         bottom_layout = QHBoxLayout()
         bottom_layout.setContentsMargins(0, 0, 0, 0)
         bottom_layout.setSpacing(0)
         
-        # Kelompok Harga (Label "Harga" dan Nilai Harga)
         price_group = QVBoxLayout()
         price_group.setContentsMargins(0, 0, 0, 0)
         price_group.setSpacing(0)
@@ -257,28 +210,13 @@ class FieldCard(QFrame):
         price_group.addWidget(self.price_tag)
         price_group.addWidget(self.price_val)
         
-        # Tombol Booking
-        self.btn_book = QPushButton("Booking Lapangan")
-        self.btn_book.setObjectName("btnCardAction")
-        self.btn_book.setFixedSize(150, 42)
-        self.btn_book.setCursor(Qt.PointingHandCursor)
-        
-        # Menghubungkan klik tombol dengan sinyal 'request_book'
-        self.btn_book.clicked.connect(lambda: self.request_book.emit(title, img_name, self.harga_int))
-        
-        # Memasukkan elemen harga dan tombol ke area bawah
         bottom_layout.addLayout(price_group)
-        bottom_layout.addStretch()
-        bottom_layout.addWidget(self.btn_book)
+        bottom_layout.addStretch() # Memastikan harga tetap menempel di sebelah kiri
 
-        # Menambahkan area bawah ke layout utama kartu
         main_layout.addLayout(bottom_layout)
 
 # Kelas Induk untuk Halaman Utama (Beranda)
 class HomePage(QWidget):
-    # Sinyal kustom untuk meneruskan permintaan booking dari dalam FieldCard ke Main Window
-    request_book = Signal(str, str, int)
-
     def __init__(self):
         super().__init__()
         # Memanggil metode inisialisasi antarmuka
@@ -502,18 +440,14 @@ class HomePage(QWidget):
         self.btn_hero.clicked.connect(self.btn_booking.click)
 
     # Fungsi untuk memuat data lapangan dari database dan merendernya ke antarmuka
+    # KODE YANG DIPERBARUI
     def load_dynamic_fields(self, fields):
-        # Membersihkan widget/layout lama sebelum merender data baru
         while self.fields_layout.count():
             item = self.fields_layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
-        
-        # Iterasi seluruh data lapangan yang dikirim
+
         for f in fields:
-            # Menginisialisasi objek Kartu Lapangan (indeks 2: gambar, indeks 1: nama, indeks 3: harga)
             card = FieldCard(f[2], f[1], f[3])
-            # Mengaitkan sinyal klik pada kartu agar diteruskan ke Main Window
-            card.request_book.connect(self.request_book.emit)
-            # Menambahkan kartu ke dalam kontainer
+            # Baris 'card.request_book.connect(self.request_book.emit)' DIHAPUS
             self.fields_layout.addWidget(card)

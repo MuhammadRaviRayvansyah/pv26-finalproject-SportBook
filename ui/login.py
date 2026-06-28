@@ -10,31 +10,22 @@ from database.db_manager import validate_login
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class BackgroundFrame(QFrame):
-    """Custom QFrame untuk menggambar background image agar selalu responsif dan tampil."""
     def __init__(self, parent=None):
         super().__init__(parent)
         self.bg_image_path = os.path.join(BASE_DIR, "assets", "images", "stadium_bg.jpg")
         self.pixmap = QPixmap(self.bg_image_path)
 
     def paintEvent(self, event):
+        super().paintEvent(event)
         painter = QPainter(self)
-        # Jika gambar ditemukan, gambar sebagai background
         if not self.pixmap.isNull():
-            # Skalakan gambar memenuhi layar sambil mempertahankan aspek rasio
             scaled_pixmap = self.pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
-            
-            # Posisikan gambar di tengah
             x = (self.width() - scaled_pixmap.width()) // 2
             y = (self.height() - scaled_pixmap.height()) // 2
-            
             painter.drawPixmap(x, y, scaled_pixmap)
         else:
-            # Fallback warna jika gambar gagal dimuat
             painter.fillRect(self.rect(), QColor("#1a1a1a"))
         
-        super().paintEvent(event)
-
-
 class MainWindow(QWidget):
     login_successful = Signal(str, str) # nama_user, role_user
 
@@ -76,15 +67,14 @@ class MainWindow(QWidget):
 
         self.card_layout = QVBoxLayout(self.login_card)
         self.card_layout.setContentsMargins(40, 40, 40, 40)
-        self.card_layout.setSpacing(20) # Jarak antar grup besar
+        self.card_layout.setSpacing(20) 
 
-        # 1. Logo
+        # Logo
         self.logo_label = QLabel()
         logo_path = os.path.join(BASE_DIR, "assets", "logos", "sportbook_logo.png")
         pixmap_logo = QPixmap(logo_path)
         
         if not pixmap_logo.isNull():
-            # Atur ukuran logo agar proporsional
             self.logo_label.setPixmap(pixmap_logo.scaled(180, 60, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         else:
             self.logo_label.setText("[ Logo Tidak Ditemukan ]")
@@ -92,7 +82,7 @@ class MainWindow(QWidget):
         self.logo_label.setAlignment(Qt.AlignCenter)
         self.card_layout.addWidget(self.logo_label)
 
-        # 2. Title & Subtitle Group
+        # Title & Subtitle Group
         self.header_layout = QVBoxLayout()
         self.header_layout.setSpacing(5)
         
@@ -109,7 +99,7 @@ class MainWindow(QWidget):
         self.header_layout.addWidget(self.subtitle_label)
         self.card_layout.addLayout(self.header_layout)
 
-        # 3. Form Input Nama
+        # Form Input Nama
         self.nama_layout = QVBoxLayout()
         self.nama_layout.setSpacing(8)
         
@@ -123,13 +113,12 @@ class MainWindow(QWidget):
         self.nama_layout.addWidget(self.nama_input)
         self.card_layout.addLayout(self.nama_layout)
 
-        # 4. Form Input Password (Diperbaiki jaraknya)
+        # Form Input Password
         self.pass_layout = QVBoxLayout()
         self.pass_layout.setSpacing(8)
         
         self.pass_label = QLabel("Kata Sandi")
         self.pass_label.setObjectName("fieldLabel")
-        
         self.pass_input = QLineEdit()
         self.pass_input.setPlaceholderText("Masukkan Kata Sandi")
         self.pass_input.setEchoMode(QLineEdit.Password)
@@ -139,16 +128,15 @@ class MainWindow(QWidget):
         self.pass_layout.addWidget(self.pass_input)
         self.card_layout.addLayout(self.pass_layout)
 
-        # 5. Tombol Masuk
+        # Tombol Masuk
         self.btn_masuk = QPushButton("Masuk")
         self.btn_masuk.setObjectName("btnMasuk")
         self.btn_masuk.setFixedHeight(50)
         self.btn_masuk.setCursor(Qt.PointingHandCursor)
         self.card_layout.addWidget(self.btn_masuk)
-        # Hubungkan tombol masuk ke fungsi proses_login
         self.btn_masuk.clicked.connect(self.proses_login)
 
-        # 6. Footer Text
+        # Footer Text
         self.footer_layout = QHBoxLayout()
         self.footer_text = QLabel("Tidak Punya Akun?")
         self.footer_text.setObjectName("footerText")
@@ -167,7 +155,6 @@ class MainWindow(QWidget):
         self.bg_layout.addWidget(self.login_card)
         self.main_layout.addWidget(self.bg_frame)
 
-    # --- FUNGSI LOGIKA DATABASE ---
     def proses_login(self):
         nama = self.nama_input.text().strip()
         password = self.pass_input.text().strip()

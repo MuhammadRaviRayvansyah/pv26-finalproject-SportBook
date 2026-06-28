@@ -23,7 +23,7 @@ def init_db():
         )
     ''')
     
-    # 2. Tabel Bookings (Dengan tanda kutip pada "status" untuk keamanan keyword)
+    # 2. Tabel Bookings
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS bookings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,7 +35,7 @@ def init_db():
         )
     ''')
 
-    # 3. Tabel Lapangan (Tanpa kolom kategori)
+    # 3. Tabel Lapangan
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS lapangan (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,7 +46,6 @@ def init_db():
         )
     ''')
     
-    # --- MIGRASI DATA ---
     
     # Tambah Admin Default
     cursor.execute("SELECT * FROM users WHERE email='admin@sportbook.com'")
@@ -54,7 +53,7 @@ def init_db():
         cursor.execute("INSERT INTO users (nama, email, password, role) VALUES (?, ?, ?, ?)",
                        ("Admin SportBook", "admin@sportbook.com", "admin123", "admin"))
 
-    # Tambah Lapangan Default (Tanpa kategori)
+    # Tambah Lapangan Default
     cursor.execute("SELECT COUNT(*) FROM lapangan")
     if cursor.fetchone()[0] == 0:
         default_fields = [
@@ -67,8 +66,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-# --- FUNGSI AMBIL DATA LAPANGAN (DIPAKAI OLEH USER) ---
-
+# FUNGSI AMBIL DATA LAPANGAN (DIPAKAI OLEH USER)
 def get_all_fields():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -77,8 +75,7 @@ def get_all_fields():
     conn.close()
     return rows
 
-# --- FUNGSI STATISTIK ADMIN ---
-
+# FUNGSI STATISTIK ADMIN
 def get_all_bookings_admin():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -100,9 +97,7 @@ def get_admin_stats():
     
     cursor.execute("SELECT COUNT(*) FROM lapangan")
     total_fields = cursor.fetchone()[0]
-    
-    # Estimasi pendapatan (Total booking * harga rata-rata 200rb sebagai dummy logic sederhana)
-    # Jika ingin akurat, harus simpan harga di tabel bookings
+
     total_revenue = total_bookings * 200000
     
     conn.close()
@@ -134,8 +129,7 @@ def validate_login(nama, password):
     conn.close()
     return user
 
-# --- FUNGSI BARU UNTUK BOOKING ---
-
+# FUNGSI BARU UNTUK BOOKING
 def get_booked_slots(lapangan_nama, tanggal):
     """Mengambil daftar jam yang sudah dibooking untuk lapangan tertentu."""
     conn = sqlite3.connect(DB_PATH)
