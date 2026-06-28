@@ -114,31 +114,31 @@ SportBook/
 ![Login](Assets/screenshots/image.png)
 
 ### Register
-![Register](Assets/screenshots/image-1.png)
+![Register](assets/screenshots/image-1.png)
 
 ### Beranda
-![Beranda](Assets/screenshots/image-2.png)
+![Beranda](assets/screenshots/image-2.png)
 
 ### Booking Lapangan
-![Booking](Assets/screenshots/image-6.png)
+![Booking](assets/screenshots/image-6.png)
 
 ### Detail Booking
-![Detail Booking](Assets/screenshots/image-3.png)
+![Detail Booking](assets/screenshots/image-3.png)
 
 ### Pembayaran
-![Pembayaran](Assets/screenshots/image-7.png)
+![Pembayaran](assets/screenshots/image-7.png)
 
 ### Notifikasi Sukses
-![Sukses](Assets/screenshots/image-8.png)
+![Sukses](assets/screenshots/image-8.png)
 
 ### Dashboard Admin
-![Dashboard Admin](Assets/screenshots/image-4.png)
+![Dashboard Admin](assets/screenshots/image-4.png)
 
 ### Daftar Pemesanan Admin
-![Dashboard Admin](Assets/screenshots/image-5.png)
+![Dashboard Admin](assets/screenshots/image-5.png)
 
 ### Pengaturan Akun
-![Pengaturan](Assets/screenshots/image-9.png)
+![Pengaturan](assets/screenshots/image-9.png)
 
 ---
 
