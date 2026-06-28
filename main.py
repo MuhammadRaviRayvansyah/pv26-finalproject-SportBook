@@ -281,40 +281,33 @@ if __name__ == "__main__":
     login_page.login_successful.connect(saat_login_berhasil)
     register_page.register_successful.connect(buka_halaman_login)
 
-    home_page.btn_booking.clicked.connect(buka_halaman_booking)
-    home_page.btn_hist.clicked.connect(buka_halaman_history)
-    home_page.btn_settings.clicked.connect(buka_halaman_pengaturan)
+    # --- PERBAIKAN NAVBAR BERANDA ---
+    home_page.bot_nav.nav_booking.connect(buka_halaman_booking)
+    home_page.bot_nav.nav_history.connect(buka_halaman_history)
+    home_page.bot_nav.nav_settings.connect(buka_halaman_pengaturan)
     
-    booking_page.btn_home.clicked.connect(buka_halaman_beranda)
-    booking_page.btn_hist.clicked.connect(buka_halaman_history)
-    booking_page.btn_settings.clicked.connect(buka_halaman_pengaturan)
-    booking_page.btn_back.clicked.connect(buka_halaman_beranda)
+    # --- PERBAIKAN NAVBAR BOOKING ---
+    booking_page.bot_nav.nav_home.connect(buka_halaman_beranda)
+    booking_page.bot_nav.nav_history.connect(buka_halaman_history)
+    booking_page.bot_nav.nav_settings.connect(buka_halaman_pengaturan)
+    booking_page.btn_back.clicked.connect(buka_halaman_beranda) # Tombol back atas tetap
     
-    history_page.btn_home.clicked.connect(buka_halaman_beranda)
-    history_page.btn_booking.clicked.connect(buka_halaman_booking)
-    history_page.btn_settings.clicked.connect(buka_halaman_pengaturan)
-    history_page.btn_back.clicked.connect(buka_halaman_beranda)
+    # --- PERBAIKAN NAVBAR HISTORY ---
+    history_page.bot_nav.nav_home.connect(buka_halaman_beranda)
+    history_page.bot_nav.nav_booking.connect(buka_halaman_booking)
+    history_page.bot_nav.nav_settings.connect(buka_halaman_pengaturan)
+    history_page.btn_back.clicked.connect(buka_halaman_beranda) # Tombol back atas tetap
 
-    pengaturan_page.btn_home.clicked.connect(buka_halaman_beranda)
-    pengaturan_page.btn_booking.clicked.connect(buka_halaman_booking)
-    pengaturan_page.btn_hist.clicked.connect(buka_halaman_history)
+    # --- PERBAIKAN NAVBAR PENGATURAN ---
+    pengaturan_page.bot_nav.nav_home.connect(buka_halaman_beranda)
+    pengaturan_page.bot_nav.nav_booking.connect(buka_halaman_booking)
+    pengaturan_page.bot_nav.nav_history.connect(buka_halaman_history)
 
-    def buat_label_bisa_diklik(label_widget):
-        label_widget.setCursor(Qt.PointingHandCursor)
-        label_widget.mousePressEvent = buka_halaman_pengaturan
-
-    buat_label_bisa_diklik(home_page.user_name)
-    buat_label_bisa_diklik(home_page.icon_user)
-    buat_label_bisa_diklik(booking_page.user_name)
-    buat_label_bisa_diklik(booking_page.icon_user)
-    buat_label_bisa_diklik(history_page.user_name)
-    buat_label_bisa_diklik(history_page.icon_user)
-
+    # --- AKSI LAINNYA (Biarkan seperti semula) ---
     pengaturan_page.save_clicked.connect(simpan_pengaturan)
     pengaturan_page.logout_clicked.connect(proses_logout)
-
-    history_page.request_delete.connect(hapus_riwayat)
     
+    history_page.request_delete.connect(hapus_riwayat)
     booking_page.request_book.connect(buka_detail_lapangan)
     
     detail_page.go_back.connect(buka_halaman_booking)

@@ -15,7 +15,6 @@ class NotifSuksesPage(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        # PERBAIKAN 1 & 2: Mengganti ObjectName dan memaksa warna putih solid (#FFFFFF)
         self.setObjectName("notifSuksesPage")
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setStyleSheet("QWidget#notifSuksesPage { background-color: #FFFFFF; }")

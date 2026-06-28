@@ -41,8 +41,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nama TEXT NOT NULL,
             gambar TEXT NOT NULL,
-            harga TEXT NOT NULL,
-            deskripsi TEXT
+            harga TEXT NOT NULL
         )
     ''')
     
@@ -57,11 +56,11 @@ def init_db():
     cursor.execute("SELECT COUNT(*) FROM lapangan")
     if cursor.fetchone()[0] == 0:
         default_fields = [
-            ("Lapangan 1", "lapangan_1.jpg", "200.000", "Lapangan futsal dengan rumput sintetis berkualitas."),
-            ("Lapangan 2", "lapangan_2.jpg", "200.000", "Lapangan basket indoor dengan lantai kayu standar."),
-            ("Lapangan 3", "lapangan_3.jpg", "200.000", "Lapangan badminton dengan karpet standar PBSI.")
+            ("Lapangan 1", "lapangan_1.jpg", "200.000"),
+            ("Lapangan 2", "lapangan_2.jpg", "200.000"),
+            ("Lapangan 3", "lapangan_3.jpg", "200.000")
         ]
-        cursor.executemany("INSERT INTO lapangan (nama, gambar, harga, deskripsi) VALUES (?, ?, ?, ?)", default_fields)
+        cursor.executemany("INSERT INTO lapangan (nama, gambar, harga) VALUES (?, ?, ?)", default_fields)
 
     conn.commit()
     conn.close()
@@ -70,7 +69,7 @@ def init_db():
 def get_all_fields():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("SELECT id, nama, gambar, harga, deskripsi FROM lapangan ORDER BY id DESC")
+    cursor.execute("SELECT id, nama, gambar, harga, deskripsi FROM lapangan ORDER BY id ASC")
     rows = cursor.fetchall()
     conn.close()
     return rows

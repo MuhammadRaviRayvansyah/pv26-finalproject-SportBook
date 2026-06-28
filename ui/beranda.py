@@ -5,6 +5,8 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
 
+from ui.navbar import BottomNavbar
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def create_colored_icon(icon_path, color, size=28):
@@ -190,7 +192,7 @@ class FieldCard(QFrame):
 
         main_layout.addLayout(info_layout)
 
-        # Bagian 3: Area Harga (Tanpa Tombol Booking)
+        # Bagian 3: Area Harga 
         bottom_layout = QHBoxLayout()
         bottom_layout.setContentsMargins(0, 0, 0, 0)
         bottom_layout.setSpacing(0)
@@ -211,25 +213,22 @@ class FieldCard(QFrame):
         price_group.addWidget(self.price_val)
         
         bottom_layout.addLayout(price_group)
-        bottom_layout.addStretch() # Memastikan harga tetap menempel di sebelah kiri
+        bottom_layout.addStretch()
 
         main_layout.addLayout(bottom_layout)
 
-# Kelas Induk untuk Halaman Utama (Beranda)
 class HomePage(QWidget):
     def __init__(self):
         super().__init__()
-        # Memanggil metode inisialisasi antarmuka
         self.setup_ui()
 
     def setup_ui(self):
         self.setObjectName("homePage")
-        # Tata letak utama halaman beranda
         self.main_layout = QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
-        # --- BAGIAN 1: TOP NAVBAR (Navigasi Atas) ---
+        # BAGIAN 1: TOP NAVBAR
         self.top_nav = QFrame()
         self.top_nav.setObjectName("topNav")
         self.top_nav.setFixedHeight(65)
@@ -257,23 +256,13 @@ class HomePage(QWidget):
         self.user_name = QLabel("Ravi")
         self.user_name.setObjectName("userName")
         
-        # Ikon profil pengguna
-        self.icon_user = QLabel()
-        user_icon_path = os.path.join(BASE_DIR, "assets", "icons", "user.svg")
-        user_pixmap = QPixmap(user_icon_path)
-        if not user_pixmap.isNull():
-            self.icon_user.setPixmap(user_pixmap.scaled(22, 22, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        self.icon_user.setFixedSize(22, 22)
-        self.icon_user.setCursor(Qt.PointingHandCursor)
-        
         user_layout.addWidget(self.user_name)
-        user_layout.addWidget(self.icon_user)
 
         top_layout.addWidget(self.logo)
-        top_layout.addStretch() # Spacer untuk mendorong profil ke kanan
+        top_layout.addStretch()
         top_layout.addLayout(user_layout)
 
-        # --- BAGIAN 2: SCROLL AREA (Area Konten Utama) ---
+        # BAGIAN 2: SCROLL AREA Area Konten Utama
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True) # Agar konten menyesuaikan lebar window
         self.scroll.setFrameShape(QFrame.NoFrame)
@@ -289,7 +278,7 @@ class HomePage(QWidget):
         self.scroll_layout.setContentsMargins(0, 0, 0, 0)
         self.scroll_layout.setSpacing(0)
 
-        # --- KONTEN DALAM (HERO SECTION + LIST LAPANGAN) ---
+        # KONTEN DALAM HERO SECTION + LIST LAPANGAN
         content_widget = QWidget()
         content_layout = QVBoxLayout(content_widget)
         content_layout.setContentsMargins(25, 25, 25, 25)
@@ -347,85 +336,17 @@ class HomePage(QWidget):
         self.list_title.setAlignment(Qt.AlignCenter)
         content_layout.addWidget(self.list_title)
 
-        # Kontainer kosong untuk menampung kartu lapangan yang digenerate secara dinamis
         self.fields_container = QWidget()
         self.fields_layout = QVBoxLayout(self.fields_container)
-        
-        # PERBAIKAN: Ubah margin bawah dari 0 menjadi 25 agar shadow kartu terakhir memiliki ruang
         self.fields_layout.setContentsMargins(0, 0, 0, 25) 
-        
         self.fields_layout.setSpacing(25)
         content_layout.addWidget(self.fields_container)
 
         self.scroll_layout.addWidget(content_widget)
         self.scroll.setWidget(self.scroll_content)
 
-        # --- BAGIAN 3: BOTTOM NAVBAR (Navigasi Bawah) ---
-        self.bot_nav = QFrame()
-        self.bot_nav.setFixedHeight(75)
-        # Mengizinkan pewarnaan background lewat stylesheet
-        self.bot_nav.setAttribute(Qt.WA_StyledBackground, True)
-        self.bot_nav.setStyleSheet("background-color: white;")
-        
-        # Bayangan navbar bawah
-        shadow_bot = QGraphicsDropShadowEffect(self)
-        shadow_bot.setBlurRadius(20)
-        shadow_bot.setXOffset(0)
-        shadow_bot.setYOffset(-4) # Nilai negatif agar bayangan mengarah ke atas
-        shadow_bot.setColor(QColor(0, 0, 0, 20))
-        self.bot_nav.setGraphicsEffect(shadow_bot)
-
-        bot_layout = QHBoxLayout(self.bot_nav)
-        bot_layout.setContentsMargins(0, 5, 0, 5) 
-        bot_layout.setSpacing(0) 
-
-        # Jalur ikon untuk menu bawah
-        icon_home = os.path.join(BASE_DIR, "assets", "icons", "home.svg")
-        icon_schedule = os.path.join(BASE_DIR, "assets", "icons", "schedule.svg")
-        icon_history = os.path.join(BASE_DIR, "assets", "icons", "history.svg")
-        icon_gear = os.path.join(BASE_DIR, "assets", "icons", "gear.svg")
-
-        # Tombol Menu Beranda (Diatur sebagai status aktif/hijau)
-        self.btn_home = QToolButton()
-        self.btn_home.setIcon(create_colored_icon(icon_home, QColor(34, 197, 94), 28)) 
-        self.btn_home.setText("Beranda")
-        self.btn_home.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.btn_home.setCursor(Qt.PointingHandCursor)
-        self.btn_home.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding) 
-        self.btn_home.setStyleSheet("color: #22C55E; border: none; font-size: 13px; font-weight: bold;")
-
-        # Tombol Menu Booking
-        self.btn_booking = QToolButton()
-        self.btn_booking.setIcon(create_colored_icon(icon_schedule, QColor(113, 113, 122), 28)) 
-        self.btn_booking.setText("Booking")
-        self.btn_booking.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.btn_booking.setCursor(Qt.PointingHandCursor)
-        self.btn_booking.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.btn_booking.setStyleSheet("color: #71717A; border: none; font-size: 13px; font-weight: bold;")
-
-        # Tombol Menu Riwayat
-        self.btn_hist = QToolButton()
-        self.btn_hist.setIcon(create_colored_icon(icon_history, QColor(113, 113, 122), 28)) 
-        self.btn_hist.setText("Riwayat")
-        self.btn_hist.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.btn_hist.setCursor(Qt.PointingHandCursor)
-        self.btn_hist.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.btn_hist.setStyleSheet("color: #71717A; border: none; font-size: 13px; font-weight: bold;")
-
-        # Tombol Menu Pengaturan
-        self.btn_settings = QToolButton()
-        self.btn_settings.setIcon(create_colored_icon(icon_gear, QColor(113, 113, 122), 28)) 
-        self.btn_settings.setText("Pengaturan")
-        self.btn_settings.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.btn_settings.setCursor(Qt.PointingHandCursor)
-        self.btn_settings.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.btn_settings.setStyleSheet("color: #71717A; border: none; font-size: 13px; font-weight: bold;")
-
-        # Menambahkan seluruh tombol ke tata letak navbar bawah
-        bot_layout.addWidget(self.btn_home)
-        bot_layout.addWidget(self.btn_booking)
-        bot_layout.addWidget(self.btn_hist)
-        bot_layout.addWidget(self.btn_settings)
+        # BAGIAN 3: BOTTOM NAVBAR Navigasi Bawah
+        self.bot_nav = BottomNavbar(active_page="beranda")
 
         # Merakit semua komponen ke tata letak utama halaman
         self.main_layout.addWidget(self.top_nav)
@@ -436,11 +357,10 @@ class HomePage(QWidget):
         self.top_nav.raise_()
         self.bot_nav.raise_()
 
-        # Menghubungkan tombol hero agar memiliki aksi yang sama dengan tombol menu booking
-        self.btn_hero.clicked.connect(self.btn_booking.click)
+        # Memicu sinyal nav_booking yang ada di dalam bot_nav
+        self.btn_hero.clicked.connect(self.bot_nav.nav_booking.emit)
+        
 
-    # Fungsi untuk memuat data lapangan dari database dan merendernya ke antarmuka
-    # KODE YANG DIPERBARUI
     def load_dynamic_fields(self, fields):
         while self.fields_layout.count():
             item = self.fields_layout.takeAt(0)
@@ -449,5 +369,4 @@ class HomePage(QWidget):
 
         for f in fields:
             card = FieldCard(f[2], f[1], f[3])
-            # Baris 'card.request_book.connect(self.request_book.emit)' DIHAPUS
             self.fields_layout.addWidget(card)
