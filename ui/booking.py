@@ -5,25 +5,8 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
 
-from ui.navbar import BottomNavbar
+from ui.navbar import BottomNavbar, create_colored_icon
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-def create_colored_icon(icon_path, color, size=28):
-    pixmap = QPixmap(icon_path)
-    if not pixmap.isNull():
-        pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        colored_pixmap = QPixmap(pixmap.size())
-        colored_pixmap.fill(Qt.transparent)
-        
-        painter = QPainter(colored_pixmap)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.drawPixmap(0, 0, pixmap)
-        painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-        painter.fillRect(colored_pixmap.rect(), color)
-        painter.end()
-        
-        return QIcon(colored_pixmap)
-    return QIcon()
 
 class CardImage(QWidget):
     def __init__(self, img_path, parent=None):
