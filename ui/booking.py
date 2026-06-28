@@ -1,9 +1,9 @@
 import os
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QFrame, QScrollArea, QSizePolicy, 
-                             QGraphicsDropShadowEffect, QToolButton)
+                             QGraphicsDropShadowEffect)
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
+from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath
 
 from ui.navbar import BottomNavbar, create_colored_icon
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -17,6 +17,7 @@ class CardImage(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
+        super().paintEvent(event)
         painter.setRenderHint(QPainter.Antialiasing)
         if not self.pixmap.isNull():
             scaled = self.pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
@@ -135,7 +136,7 @@ class FieldCard(QFrame):
         price_group.setContentsMargins(0, 0, 0, 0)
         price_group.setSpacing(0)
         self.price_tag = QLabel("Harga")
-        self.price_tag.setObjectName("cardDesc")
+        self.price_tag.setObjectName("priceLabel")
         self.price_tag.setContentsMargins(0, 0, 0, 0)
         self.price_tag.setStyleSheet("color: #000000; font-weight: bold;")
         self.price_val = QLabel(f"{price_str}/Jam")

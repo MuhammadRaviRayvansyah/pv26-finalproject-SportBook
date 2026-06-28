@@ -10,14 +10,12 @@
     font-size: 26px;
     font-weight: bold;
     color: #000000;
-    font-family: "Segoe UI", "Inter", sans-serif;
     margin-bottom: 5px;
 }
 
 #subtitleLabel {
     font-size: 14px;
     color: #71717A;
-    font-family: "Segoe UI", "Inter", sans-serif;
 }
 
 /* Form Label */
@@ -25,7 +23,6 @@
     font-size: 14px;
     font-weight: 600;
     color: #000000;
-    font-family: "Segoe UI", "Inter", sans-serif;
 }
 
 /* Form Input Field */
@@ -55,7 +52,6 @@ QLineEdit::placeholder {
     font-weight: bold;
     border-radius: 12px;
     border: none;
-    font-family: "Segoe UI", "Inter", sans-serif;
 }
 
 #btnSubmit:hover, #btnMasuk:hover {
@@ -89,7 +85,7 @@ QLineEdit::placeholder {
 }
 
 /* --- Penambahan Warna Background F5F5F5 --- */
-#homePage, #contentScroll, #scrollContent {
+#scrollContent {
     background-color: #F5F5F5;
 }
 
@@ -107,32 +103,24 @@ QLineEdit::placeholder {
     font-size: 15px;
     font-weight: 600;
     color: #111827;
-    font-family: "Segoe UI", sans-serif;
 }
 
 /* Background image dihapus karena sudah di-handle oleh PaintEvent pada HeroFrame */
-#heroSection {
-    border-radius: 24px;
-}
-
 #heroTitle { 
     color: white; 
     font-size: 28px; 
-    font-family: "Segoe UI", sans-serif;
 }
 
 #heroSub { 
     color: white; 
     font-size: 18px; 
     font-weight: 600; 
-    font-family: "Segoe UI", sans-serif;
 }
 
 #heroSubSmall { 
     color: white; 
     font-size: 14px;
     font-weight: normal;
-    font-family: "Segoe UI", sans-serif;
     margin-bottom: 5px;
 }
 
@@ -145,7 +133,6 @@ QLineEdit::placeholder {
     font-weight: bold;
     border: none;
     padding: 5px 10px;
-    font-family: "Segoe UI", sans-serif;
 }
 
 #locBadge:hover {
@@ -160,7 +147,6 @@ QLineEdit::placeholder {
     font-weight: bold;
     font-size: 14px;
     border: none;
-    font-family: "Segoe UI", sans-serif;
 }
 
 #btnHero:hover {
@@ -172,30 +158,24 @@ QLineEdit::placeholder {
 #fieldCard {
     background-color: white;
     border-radius: 20px;
-    border: none;
 }
 
 #cardTitle {
     font-size: 22px;
     font-weight: bold;
     color: #111827;
-    font-family: "Segoe UI", sans-serif;
-    margin: 0px;
-    padding: 0px;
 }
 
-#cardDesc {
+#priceLabel {
     font-size: 14px;
-    font-family: "Segoe UI", sans-serif;
-    margin: 0px;
-    padding: 0px;
+    color: #000000; 
+    font-weight: bold;
 }
 
 #cardPrice {
     font-size: 18px;
     font-weight: bold;
     color: #22C55E;
-    font-family: "Segoe UI", sans-serif;
     margin: 0px;
     padding: 0px;
 }
@@ -208,7 +188,6 @@ QLineEdit::placeholder {
     font-weight: bold;
     font-size: 14px;
     border: none;
-    font-family: "Segoe UI", sans-serif;
 }
 
 #btnCardAction:hover {
@@ -228,7 +207,6 @@ QLineEdit::placeholder {
     padding: 8px;
     border-radius: 8px;
     font-size: 12px;
-    font-family: "Segoe UI", sans-serif;
 }
 
 #btnNav:hover, #btnNavActive:hover {
@@ -245,7 +223,6 @@ QToolButton {
     font-size: 20px;
     font-weight: bold;
     color: #111827;
-    font-family: "Segoe UI", "Inter", sans-serif;
 }
 
 #btnBack {
@@ -255,7 +232,6 @@ QToolButton {
     font-weight: bold;
     color: #111827;
     padding: 0px 10px;
-    font-family: "Segoe UI", sans-serif;
 }
 
 #btnBack:hover {
@@ -267,7 +243,6 @@ QToolButton {
     font-size: 20px;
     font-weight: bold;
     color: #111827;
-    font-family: "Segoe UI", "Inter", sans-serif;
     margin-top: 10px;
     padding-bottom: 5px;
 }
@@ -283,7 +258,6 @@ QToolButton {
     font-size: 26px;
     font-weight: bold;
     color: #111827;
-    font-family: "Segoe UI", sans-serif;
     margin-top: 5px;
 }
 
@@ -291,14 +265,12 @@ QToolButton {
     font-size: 14px;
     font-weight: bold;
     color: #111827;
-    font-family: "Segoe UI", sans-serif;
 }
 
 #detailTextGreen {
     font-size: 14px;
     font-weight: bold;
     color: #26BF6C;
-    font-family: "Segoe UI", sans-serif;
     margin-left: 10px;
 }
 
@@ -306,14 +278,12 @@ QToolButton {
     font-size: 28px;
     font-weight: bold;
     color: #26BF6C;
-    font-family: "Segoe UI", sans-serif;
 }
 
 /* Tombol Jadwal (Grid) dengan 3 Status */
 #slotBtn {
     border: none;
     font-size: 13px;
-    font-family: "Segoe UI", sans-serif;
 }
 
 #slotBtn[state="available"] {
@@ -344,7 +314,6 @@ QToolButton {
     padding: 4px 15px;
     font-weight: bold;
     font-size: 14px;
-    font-family: "Segoe UI", sans-serif;
 }
 
 #btnSubmitGreen {
@@ -353,7 +322,6 @@ QToolButton {
     border-radius: 15px;
     font-weight: bold;
     font-size: 16px;
-    font-family: "Segoe UI", sans-serif;
     border: none;
 }
 
@@ -372,7 +340,6 @@ QToolButton {
     font-size: 20px;
     font-weight: bold;
     color: #000000;
-    font-family: "Segoe UI", sans-serif;
 }
 
 /* Memperbesar ukuran Radio Button agar menyerupai referensi UI */
@@ -393,14 +360,12 @@ QToolButton {
     font-size: 16px;
     font-weight: bold;
     color: #6B7280;
-    font-family: "Segoe UI", sans-serif;
 }
 
 #summaryTotal {
     font-size: 26px;
     font-weight: bold;
     color: #26BF6C;
-    font-family: "Segoe UI", sans-serif;
 }
 
 /* --- NOTIFIKASI SUKSES STYLES --- */
@@ -409,7 +374,6 @@ QToolButton {
     font-weight: bold;
     color: #000000;
     line-height: 1.2;
-    font-family: "Segoe UI", sans-serif;
 }
 
 #notifDesc {
@@ -417,5 +381,4 @@ QToolButton {
     font-weight: 500;
     color: #000000;
     line-height: 1.4;
-    font-family: "Segoe UI", sans-serif;
 }

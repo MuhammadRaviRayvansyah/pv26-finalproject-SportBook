@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QFrame, QScrollArea, QSizePolicy, 
                              QGraphicsDropShadowEffect, QGridLayout, QComboBox)
-from PySide6.QtCore import Qt, Signal, QSize
-from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath
 
-from ui.navbar import BottomNavbar, create_colored_icon
+from ui.navbar import create_colored_icon
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 try:

@@ -5,7 +5,6 @@ from PySide6.QtGui import QPixmap, QPainter, QColor, QIcon
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Pindahkan fungsi icon ke sini agar bisa dipakai oleh Navbar
 def create_colored_icon(icon_path, color, size=28):
     pixmap = QPixmap(icon_path)
     if not pixmap.isNull():

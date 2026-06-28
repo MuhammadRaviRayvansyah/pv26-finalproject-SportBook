@@ -1,9 +1,8 @@
 import os
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
-                             QPushButton, QFrame, QScrollArea, QGraphicsDropShadowEffect, 
-                             QToolButton, QMessageBox, QSizePolicy)
+                             QPushButton, QFrame, QScrollArea, QGraphicsDropShadowEffect, QMessageBox)
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
+from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath
 
 from ui.navbar import BottomNavbar, create_colored_icon
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

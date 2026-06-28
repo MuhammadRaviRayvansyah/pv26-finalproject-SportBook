@@ -54,11 +54,13 @@ def init_db():
 
     # Tambah Lapangan Default
     cursor.execute("SELECT COUNT(*) FROM lapangan")
+    # if True:
     if cursor.fetchone()[0] == 0:
         default_fields = [
             ("Lapangan 1", "lapangan_1.jpg", "200.000"),
             ("Lapangan 2", "lapangan_2.jpg", "200.000"),
-            ("Lapangan 3", "lapangan_3.jpg", "200.000")
+            ("Lapangan 3", "lapangan_3.jpg", "200.000"),
+            ("Lapangan 4", "lapangan_3.jpg", "200.000")
         ]
         cursor.executemany("INSERT INTO lapangan (nama, gambar, harga) VALUES (?, ?, ?)", default_fields)
 

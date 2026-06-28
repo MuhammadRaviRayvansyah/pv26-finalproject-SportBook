@@ -111,7 +111,7 @@ SportBook/
 ## Screenshot Aplikasi
 
 ### Login
-![Login](Assets/screenshots/image.png)
+![Login](assets/screenshots/image.png)
 
 ### Register
 ![Register](assets/screenshots/image-1.png)

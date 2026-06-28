@@ -1,9 +1,9 @@
 import os
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QFrame, QScrollArea, QSizePolicy, 
-                             QGraphicsDropShadowEffect, QToolButton)
+                             QGraphicsDropShadowEffect)
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath, QIcon
+from PySide6.QtGui import QPixmap, QPainter, QColor, QPainterPath
 
 from ui.navbar import BottomNavbar, create_colored_icon
 
@@ -33,8 +33,6 @@ class HeroFrame(QFrame):
 
             path = QPainterPath()
             path.addRoundedRect(0, 0, self.width(), self.height(), 24, 24)
-
-            # Memotong area gambar agar mengikuti bentuk sudut melengkung
             painter.setClipPath(path)
 
             x = (self.width() - scaled.width()) // 2
@@ -85,19 +83,18 @@ class FieldCard(QFrame):
         shadow.setColor(QColor(0, 0, 0, 45))
         self.setGraphicsEffect(shadow)
 
-        # Tata letak utama kartu (vertikal)
+        # Tata letak utama kartu
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(18, 18, 18, 18)
         main_layout.setSpacing(15) 
 
-        # Bagian 1: Widget Gambar Melengkung
+        # Widget Gambar Melengkung
         img_path = os.path.join(BASE_DIR, "assets", "images", img_name)
         self.img_widget = CardImage(img_path)
         main_layout.addWidget(self.img_widget)
 
-        # Bagian 2: Area Informasi (Judul, Lokasi, Buka, Jam)
+        # Area Informasi seperti Judul, Lokasi, Buka, Jam
         info_layout = QVBoxLayout()
-        info_layout.setContentsMargins(0, 0, 0, 0)
         info_layout.setSpacing(8) 
         
         # Judul Lapangan
@@ -108,13 +105,10 @@ class FieldCard(QFrame):
         
         # Baris Informasi Lokasi
         loc_layout = QHBoxLayout()
-        loc_layout.setContentsMargins(0, 0, 0, 0)
-        loc_layout.setSpacing(8)
         loc_icon = QLabel()
         icon_loc_path = os.path.join(BASE_DIR, "assets", "icons", "location.svg")
         loc_icon.setPixmap(create_colored_icon(icon_loc_path, QColor("#111827"), 18).pixmap(20, 20))
         loc_icon.setFixedSize(20, 20)
-        loc_icon.setAlignment(Qt.AlignCenter)
         
         lbl_loc_title = QLabel("Lokasi:")
         lbl_loc_title.setStyleSheet("color: #000000; font-weight: bold;")
@@ -125,18 +119,14 @@ class FieldCard(QFrame):
         loc_layout.addWidget(loc_icon)
         loc_layout.addWidget(lbl_loc_title)
         loc_layout.addWidget(lbl_loc)
-        loc_layout.addStretch()
         info_layout.addLayout(loc_layout)
 
         # Baris Informasi Hari Buka
         buka_layout = QHBoxLayout()
-        buka_layout.setContentsMargins(0, 0, 0, 0)
-        buka_layout.setSpacing(8)
         buka_icon = QLabel()
         icon_buka_path = os.path.join(BASE_DIR, "assets", "icons", "schedule.svg")
         buka_icon.setPixmap(create_colored_icon(icon_buka_path, QColor("#111827"), 18).pixmap(20, 20))
         buka_icon.setFixedSize(20, 20)
-        buka_icon.setAlignment(Qt.AlignCenter)
         
         lbl_buka = QLabel("Buka:")
         lbl_buka.setStyleSheet("color: #000000; font-weight: bold;")
@@ -147,18 +137,14 @@ class FieldCard(QFrame):
         buka_layout.addWidget(buka_icon)
         buka_layout.addWidget(lbl_buka)
         buka_layout.addWidget(lbl_buka_val)
-        buka_layout.addStretch()
         info_layout.addLayout(buka_layout)
 
-        # Baris Informasi Jam Operasional
+        # Baris Informasi Jam Buka
         jam_layout = QHBoxLayout()
-        jam_layout.setContentsMargins(0, 0, 0, 0)
-        jam_layout.setSpacing(8)
         jam_icon = QLabel()
         icon_jam_path = os.path.join(BASE_DIR, "assets", "icons", "time.svg")
         jam_icon.setPixmap(create_colored_icon(icon_jam_path, QColor("#111827"), 18).pixmap(20, 20))
         jam_icon.setFixedSize(20, 20)
-        jam_icon.setAlignment(Qt.AlignCenter)
         
         lbl_jam = QLabel("Jam:")
         lbl_jam.setStyleSheet("color: #000000; font-weight: bold;")
@@ -169,27 +155,21 @@ class FieldCard(QFrame):
         jam_layout.addWidget(jam_icon)
         jam_layout.addWidget(lbl_jam)
         jam_layout.addWidget(lbl_jam_val)
-        jam_layout.addStretch()
         info_layout.addLayout(jam_layout)
 
         main_layout.addLayout(info_layout)
 
-        # Bagian 3: Area Harga 
+        # Area Harga 
         bottom_layout = QHBoxLayout()
-        bottom_layout.setContentsMargins(0, 0, 0, 0)
-        bottom_layout.setSpacing(0)
-        
+
         price_group = QVBoxLayout()
-        price_group.setContentsMargins(0, 0, 0, 0)
         price_group.setSpacing(0)
+        
         self.price_tag = QLabel("Harga")
-        self.price_tag.setObjectName("cardDesc")
-        self.price_tag.setContentsMargins(0, 0, 0, 0)
-        self.price_tag.setStyleSheet("color: #000000; font-weight: bold;")
+        self.price_tag.setObjectName("priceLabel")
         
         self.price_val = QLabel(f"{price_str}/Jam")
         self.price_val.setObjectName("cardPrice")
-        self.price_val.setContentsMargins(0, 0, 0, 0)
         
         price_group.addWidget(self.price_tag)
         price_group.addWidget(self.price_val)
@@ -205,12 +185,11 @@ class HomePage(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        self.setObjectName("homePage")
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
 
-        # BAGIAN 1: TOP NAVBAR
+        # TOP NAVBAR
         self.top_nav = QFrame()
         self.top_nav.setObjectName("topNav")
         self.top_nav.setFixedHeight(65)
@@ -234,7 +213,6 @@ class HomePage(QWidget):
         
         # Profil Pengguna di kanan
         user_layout = QHBoxLayout()
-        user_layout.setSpacing(12)
         self.user_name = QLabel("Ravi")
         self.user_name.setObjectName("userName")
         
@@ -246,9 +224,10 @@ class HomePage(QWidget):
 
         # BAGIAN 2: SCROLL AREA Area Konten Utama
         self.scroll = QScrollArea()
-        self.scroll.setWidgetResizable(True) # Agar konten menyesuaikan lebar window
+        self.scroll.setWidgetResizable(True)
         self.scroll.setFrameShape(QFrame.NoFrame)
         self.scroll.setObjectName("contentScroll")
+
         # Menyembunyikan scrollbar
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -256,23 +235,21 @@ class HomePage(QWidget):
         # Widget sebagai penampung seluruh konten di dalam Scroll Area
         self.scroll_content = QWidget()
         self.scroll_content.setObjectName("scrollContent")
+
         self.scroll_layout = QVBoxLayout(self.scroll_content)
-        self.scroll_layout.setContentsMargins(0, 0, 0, 0)
-        self.scroll_layout.setSpacing(0)
+        self.scroll_layout.setContentsMargins(25, 25, 25, 25)
+        self.scroll_layout.setSpacing(25)
 
-        # KONTEN DALAM HERO SECTION + LIST LAPANGAN
-        content_widget = QWidget()
-        content_layout = QVBoxLayout(content_widget)
-        content_layout.setContentsMargins(25, 25, 25, 25)
-        content_layout.setSpacing(25)
-
-        # Menginisialisasi komponen HeroFrame
+        # =========================
+        # HERO SECTION
+        # =========================
         self.hero = HeroFrame()
+
         hero_layout = QVBoxLayout(self.hero)
         hero_layout.setContentsMargins(35, 30, 35, 30)
         hero_layout.setSpacing(12)
-        
-        # Teks sambutan di dalam Hero
+
+        # Teks sambutan
         self.h_title = QLabel("Hallo, <b style='color:#22C55E;'>Pengguna!</b>")
         self.h_title.setObjectName("heroTitle")
 
@@ -283,48 +260,58 @@ class HomePage(QWidget):
         self.h_sub2 = QLabel("Terdapat pilihan lapangan dan jam booking")
         self.h_sub2.setObjectName("heroSub")
         self.h_sub2.setContentsMargins(0, 0, 0, 10)
-        
-        # Tombol informasi lokasi di Hero
+
+        # Tombol lokasi
         self.loc_badge = QPushButton(" Lokasi: Mataram, Jalan xxxx")
         self.loc_badge.setObjectName("locBadge")
         self.loc_badge.setFixedSize(220, 42)
         self.loc_badge.setCursor(Qt.PointingHandCursor)
         self.loc_badge.setContentsMargins(0, 5, 0, 5)
-        
-        icon_loc_path = os.path.join(BASE_DIR, "assets", "icons", "location.svg")
-        self.loc_badge.setIcon(create_colored_icon(icon_loc_path, QColor(255, 255, 255), 18))
+
+        icon_loc_path = os.path.join(BASE_DIR,"assets","icons","location.svg")
+
+        self.loc_badge.setIcon(create_colored_icon(icon_loc_path,QColor(255, 255, 255),18))
         self.loc_badge.setIconSize(QSize(18, 18))
-        
-        # Tombol Booking utama di Hero
+
+        # Tombol booking
         self.btn_hero = QPushButton("Booking Sekarang")
         self.btn_hero.setObjectName("btnHero")
         self.btn_hero.setFixedSize(220, 42)
         self.btn_hero.setCursor(Qt.PointingHandCursor)
         self.btn_hero.setContentsMargins(0, 10, 0, 0)
 
-        # Memasukkan elemen ke tata letak Hero
+        # Memasukkan widget ke Hero
         hero_layout.addWidget(self.h_title)
         hero_layout.addWidget(self.h_sub1)
         hero_layout.addWidget(self.h_sub2)
-        hero_layout.addStretch() # Mendorong tombol ke area bawah Hero
+        hero_layout.addStretch()
         hero_layout.addWidget(self.loc_badge)
         hero_layout.addWidget(self.btn_hero)
-        
-        content_layout.addWidget(self.hero)
-        
-        # Judul untuk seksi list lapangan
+
+        # Tambahkan Hero ke Scroll Layout
+        self.scroll_layout.addWidget(self.hero)
+
+        # =========================
+        # JUDUL LIST LAPANGAN
+        # =========================
         self.list_title = QLabel("List Lapangan")
         self.list_title.setObjectName("sectionTitle")
         self.list_title.setAlignment(Qt.AlignCenter)
-        content_layout.addWidget(self.list_title)
 
+        self.scroll_layout.addWidget(self.list_title)
+
+        # =========================
+        # CONTAINER LIST LAPANGAN
+        # =========================
         self.fields_container = QWidget()
-        self.fields_layout = QVBoxLayout(self.fields_container)
-        self.fields_layout.setContentsMargins(0, 0, 0, 25) 
-        self.fields_layout.setSpacing(25)
-        content_layout.addWidget(self.fields_container)
 
-        self.scroll_layout.addWidget(content_widget)
+        self.fields_layout = QVBoxLayout(self.fields_container)
+        self.fields_layout.setContentsMargins(0, 0, 0, 25)
+        self.fields_layout.setSpacing(25)
+
+        self.scroll_layout.addWidget(self.fields_container)
+
+        # Masukkan widget ke scroll area
         self.scroll.setWidget(self.scroll_content)
 
         # BAGIAN 3: BOTTOM NAVBAR Navigasi Bawah
