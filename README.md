@@ -154,7 +154,7 @@ SportBook/
 * ui/history.py
 * ui/pengaturan.py
 
-### Yudhi Fajar Pratama (F1D02310142)
+### Yudhi Fajar Pratama (F1D02310142) dan M. Danuarta Wiraguna (F1D02310124)
 
 * ui/admin_sidebar.py
 * ui/admin_pengaturan.py

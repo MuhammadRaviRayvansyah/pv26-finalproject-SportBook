@@ -6,7 +6,6 @@ from PySide6.QtGui import QPixmap
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class NotifSuksesPage(QWidget):
-    # Signal untuk kembali ke beranda
     back_to_home = Signal()
 
     def __init__(self):

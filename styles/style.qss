@@ -248,7 +248,6 @@ QToolButton {
 #detailCard {
     background-color: white;
     border-radius: 20px;
-    border: none;
 }
 
 #detailNama {
@@ -279,7 +278,6 @@ QToolButton {
 
 /* Tombol Jadwal (Grid) dengan 3 Status */
 #slotBtn {
-    border: none;
     font-size: 13px;
 }
 
@@ -420,3 +418,94 @@ QFrame#historyCard {
     background-color: #DC2626;
 }
 
+/* ComboBox tanggal */
+QComboBox#dateCombo {
+    border: 2px solid #D1D5DB;
+    border-radius: 10px;
+    padding: 5px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: white;
+    color: #111827;
+}
+
+/* Area tombol panah */
+QComboBox#dateCombo::drop-down {
+    border: none;
+    width: 30px;
+}
+
+/* Popup daftar item */
+QComboBox#dateCombo QAbstractItemView {
+    background-color: white;
+    color: #111827;
+    selection-background-color: #22C55E;
+    selection-color: white;
+    border: 1px solid #D1D5DB;
+    outline: none;
+}
+
+
+/* Salin ini ke dalam file style.qss Anda */
+QFrame#paymentCard {
+    background-color: white;
+    border-radius: 15px;
+}
+
+QFrame#paymentCard QRadioButton::indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 12px;
+    border: 2px solid #111827;
+    background-color: white;
+    margin: 0px;
+}
+
+QFrame#paymentCard QRadioButton::indicator:checked {
+    width: 20px;
+    height: 20px;
+    border-radius: 12px;
+    border: 2px solid #111827;
+    background-color: qradialgradient(
+        cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, 
+        stop:0 #111827, stop:0.45 #111827, 
+        stop:0.55 white, stop:1 white
+    );
+}
+
+/* Styling untuk Dialog Box Konfirmasi Pembayaran */
+QMessageBox#pembayaranConfirmBox {
+    background-color: #FFFFFF;
+}
+
+/* Styling Teks di dalam Dialog Box */
+QMessageBox#pembayaranConfirmBox QLabel {
+    color: #111827;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Styling untuk semua tombol di dalam Dialog Box Pembayaran */
+QMessageBox#pembayaranConfirmBox QPushButton {
+    background-color: #26BF6C;
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 13px;
+    min-width: 75px;
+    min-height: 28px;
+    border: none;
+}
+
+QMessageBox#pembayaranConfirmBox QPushButton:hover {
+    background-color: #20A35B;
+}
+
+/* Khusus tombol 'Tidak' atau NoRole jika ingin diberikan warna berbeda (misal abu-ala/merah) */
+QMessageBox#pembayaranConfirmBox QPushButton[text="Tidak"] {
+    background-color: #EF4444;
+}
+
+QMessageBox#pembayaranConfirmBox QPushButton[text="Tidak"]:hover {
+    background-color: #DC2626;
+}

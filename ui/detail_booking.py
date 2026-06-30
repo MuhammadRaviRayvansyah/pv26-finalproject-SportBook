@@ -57,12 +57,11 @@ class DetailBookingPage(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        self.setObjectName("homePage")
         self.main_layout = QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
-        # --- TOP NAVBAR ---
+        # - TOP NAVBAR
         self.top_nav = QFrame()
         self.top_nav.setObjectName("topNav")
         self.top_nav.setFixedHeight(65)
@@ -103,7 +102,7 @@ class DetailBookingPage(QWidget):
 
         self.main_layout.addWidget(self.top_nav)
 
-        # --- SCROLL AREA ---
+        # - SCROLL AREA
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
         self.scroll.setFrameShape(QFrame.NoFrame)
@@ -139,7 +138,7 @@ class DetailBookingPage(QWidget):
         self.lbl_nama.setContentsMargins(0, 0, 0, 0)
         detail_layout.addWidget(self.lbl_nama)
 
-        # --- ROW 1: Lokasi ---
+        # - Lokasi
         loc_layout = QHBoxLayout()
         loc_layout.setContentsMargins(0, 0, 0, 0)
         loc_layout.setSpacing(8)
@@ -161,7 +160,7 @@ class DetailBookingPage(QWidget):
         loc_layout.addStretch()
         detail_layout.addLayout(loc_layout)
 
-        # --- ROW 2: Buka ---
+        # - Buka
         buka_layout = QHBoxLayout()
         buka_layout.setContentsMargins(0, 0, 0, 0)
         buka_layout.setSpacing(8)
@@ -180,7 +179,7 @@ class DetailBookingPage(QWidget):
         buka_layout.addStretch()
         detail_layout.addLayout(buka_layout)
 
-        # --- ROW 3: Jam ---
+        # - Jam
         jam_layout = QHBoxLayout()
         jam_layout.setContentsMargins(0, 0, 0, 0)
         jam_layout.setSpacing(8)
@@ -199,7 +198,7 @@ class DetailBookingPage(QWidget):
         jam_layout.addStretch()
         detail_layout.addLayout(jam_layout)
 
-        # --- ROW 4: Harga ---
+        # - Harga
         harga_layout = QHBoxLayout()
         harga_layout.setContentsMargins(0, 0, 0, 0)
         harga_layout.setSpacing(8)
@@ -240,28 +239,9 @@ class DetailBookingPage(QWidget):
         tgl_layout.addWidget(lbl_pilih_tgl)
 
         self.date_combo = QComboBox()
+        self.date_combo.setObjectName("dateCombo")
         self.date_combo.setFixedHeight(45)
         self.date_combo.setCursor(Qt.PointingHandCursor)
-        self.date_combo.setStyleSheet("""
-            QComboBox {
-                border: 2px solid #D1D5DB;
-                border-radius: 10px;
-                padding: 5px 15px;
-                font-size: 14px;
-                font-weight: bold;
-                background-color: white;
-                color: #111827;
-            }
-            QComboBox::drop-down { border: none; width: 30px; }
-            QComboBox QAbstractItemView {
-                background-color: white;
-                color: #111827;
-                selection-background-color: #22C55E;
-                selection-color: white;
-                border: 1px solid #D1D5DB;
-                outline: none;
-            }
-        """)
         
         today = datetime.now()
         for i in range(30):
@@ -274,7 +254,7 @@ class DetailBookingPage(QWidget):
         
         self.scroll_layout.addWidget(self.card_tanggal)
 
-        # CARD 2: Pilihan Jam
+        # - Pilihan Jam
         self.card_jam = QFrame()
         self.card_jam.setObjectName("detailCard")
         shadow2 = QGraphicsDropShadowEffect(self)
@@ -291,7 +271,7 @@ class DetailBookingPage(QWidget):
         self.slot_buttons = {}
         self.scroll_layout.addWidget(self.card_jam)
 
-        # CARD 3: Durasi & Submit
+        # - Durasi & Submit
         self.card_submit = QFrame()
         self.card_submit.setObjectName("detailCard")
         shadow3 = QGraphicsDropShadowEffect(self)
@@ -366,9 +346,7 @@ class DetailBookingPage(QWidget):
             "16.00 - 17.00", "18.00 - 19.00", "20.00 - 21.00", "21.00 - 22.00"
         ]
 
-        # --- LOGIKA BARU MENCEGAH BOOKING JAM KADALUARSA ---
         now = datetime.now()
-        # Jika index combo box adalah 0, berarti tanggal yang dipilih adalah hari ini
         is_today = (self.date_combo.currentIndex() == 0)
         current_hour = now.hour
 
@@ -379,10 +357,8 @@ class DetailBookingPage(QWidget):
             btn.setFixedHeight(35)
             btn.setCursor(Qt.PointingHandCursor)
             
-            # Ekstrak angka jam mulai (misal dari "08.00 - 09.00" kita ambil angka 8)
             jam_mulai = int(jam.split(".")[0])
             
-            # Cek apakah tanggalnya hari ini DAN jam dimulainya sudah lewat atau sedang berlangsung
             is_past = is_today and (jam_mulai <= current_hour)
             
             if jam in booked_slots or is_past:

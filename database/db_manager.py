@@ -136,8 +136,7 @@ def get_booked_slots(lapangan_nama, tanggal):
     cursor.execute("SELECT jam_booking FROM bookings WHERE lapangan_nama=? AND tanggal=?", (lapangan_nama, tanggal))
     rows = cursor.fetchall()
     conn.close()
-    
-    # Format return: list of strings (cth: ["08.00 - 09.00", "12.00 - 13.00"])
+
     return [row[0] for row in rows]
 
 def save_booking(user_nama, lapangan_nama, tanggal, list_jam):
@@ -168,7 +167,7 @@ def delete_user_booking(user_nama, lapangan_nama, tanggal):
     """Menyembunyikan riwayat dari User, tapi Admin tetap bisa melihatnya."""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    # Mengubah status menjadi 'deleted' alih-alih menghapus baris
+
     cursor.execute('UPDATE bookings SET "status" = "deleted" WHERE user_nama=? AND lapangan_nama=? AND tanggal=?', 
                    (user_nama, lapangan_nama, tanggal))
     conn.commit()
