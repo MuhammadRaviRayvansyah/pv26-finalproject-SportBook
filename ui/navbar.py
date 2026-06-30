@@ -19,14 +19,13 @@ def create_colored_icon(icon_path, color, size=28):
         return QIcon(colored_pixmap)
     return QIcon()
 
-# Buat Kelas Khusus untuk Navbar
 class BottomNavbar(QFrame):
     nav_home = Signal()
     nav_booking = Signal()
     nav_history = Signal()
     nav_settings = Signal()
 
-    # PERUBAHAN: Tambahkan parameter active_page dengan default "beranda"
+    # Tambahkan parameter active_page dengan default "beranda"
     def __init__(self, active_page="beranda", parent=None):
         super().__init__(parent)
         self.setFixedHeight(75)
@@ -44,13 +43,12 @@ class BottomNavbar(QFrame):
         bot_layout.setContentsMargins(0, 5, 0, 5) 
         bot_layout.setSpacing(0) 
 
-        # Simpan path ikon sebagai variabel kelas agar bisa diakses fungsi lain
         self.icon_home = os.path.join(BASE_DIR, "assets", "icons", "home.svg")
         self.icon_schedule = os.path.join(BASE_DIR, "assets", "icons", "schedule.svg")
         self.icon_history = os.path.join(BASE_DIR, "assets", "icons", "history.svg")
         self.icon_gear = os.path.join(BASE_DIR, "assets", "icons", "gear.svg")
 
-        # Inisialisasi Tombol (Warna diatur di bawah lewat fungsi)
+        # Inisialisasi Tombol 
         self.btn_home = QToolButton()
         self.btn_home.setText("Beranda")
         self.btn_home.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
@@ -79,24 +77,22 @@ class BottomNavbar(QFrame):
         self.btn_settings.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.btn_settings.clicked.connect(self.nav_settings.emit)
 
-        # Masukkan ke layout
         bot_layout.addWidget(self.btn_home)
         bot_layout.addWidget(self.btn_booking)
         bot_layout.addWidget(self.btn_hist)
         bot_layout.addWidget(self.btn_settings)
 
-        # PERUBAHAN: Panggil fungsi pewarnaan saat navbar pertama kali dibuat
+        # Panggil fungsi pewarnaan saat navbar pertama kali dibuat
         self.set_active_page(active_page)
 
-    # FUNGSI BARU: Mengatur warna berdasarkan halaman yang aktif
+    # Mengatur warna berdasarkan halaman yang aktif
     def set_active_page(self, page_name):
-        color_active = QColor(34, 197, 94)    # Hijau
-        color_inactive = QColor(113, 113, 122) # Abu-abu
+        color_active = QColor(34, 197, 94)    
+        color_inactive = QColor(113, 113, 122) 
 
         style_active = "color: #22C55E; border: none; font-size: 13px; font-weight: bold;"
         style_inactive = "color: #71717A; border: none; font-size: 13px; font-weight: bold;"
 
-        # 1. Reset semua tombol menjadi abu-abu (tidak aktif)
         self.btn_home.setIcon(create_colored_icon(self.icon_home, color_inactive, 28))
         self.btn_home.setStyleSheet(style_inactive)
         
@@ -109,7 +105,6 @@ class BottomNavbar(QFrame):
         self.btn_settings.setIcon(create_colored_icon(self.icon_gear, color_inactive, 28))
         self.btn_settings.setStyleSheet(style_inactive)
 
-        # 2. Beri warna hijau HANYA pada halaman yang sedang dibuka
         if page_name == "beranda":
             self.btn_home.setIcon(create_colored_icon(self.icon_home, color_active, 28))
             self.btn_home.setStyleSheet(style_active)

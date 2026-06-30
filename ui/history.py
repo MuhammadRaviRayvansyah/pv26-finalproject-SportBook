@@ -8,7 +8,7 @@ from ui.navbar import BottomNavbar, create_colored_icon
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class HistoryCard(QFrame):
-    delete_clicked = Signal(str, str) # PERBAIKAN: Sekarang mengirim lapangan dan tanggal
+    delete_clicked = Signal(str, str)
 
     def __init__(self, lapangan_nama, jam_range, tanggal_booking, parent=None):
         super().__init__(parent)
@@ -24,12 +24,6 @@ class HistoryCard(QFrame):
         img_path = os.path.join(BASE_DIR, "assets", "images", img_name)
 
         self.setAttribute(Qt.WA_StyledBackground, True)
-        self.setStyleSheet("""
-            QFrame#historyCard {
-                background-color: white;
-                border-radius: 20px;
-            }
-        """)
         
         shadow = QGraphicsDropShadowEffect(self)
         shadow.setBlurRadius(20)
@@ -42,43 +36,53 @@ class HistoryCard(QFrame):
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(20)
 
-        # 1. Gambar Lapangan
+        # GAMBAR LAPANGAN
         self.img_label = QLabel()
         self.img_label.setFixedSize(170, 150)
+
         pix = QPixmap(img_path)
+
         if not pix.isNull():
             scaled = pix.scaled(170, 150, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+
             path = QPainterPath()
             path.addRoundedRect(0, 0, 170, 150, 15, 15)
             
             canvas = QPixmap(170, 150)
             canvas.fill(Qt.transparent)
+
             painter = QPainter(canvas)
             painter.setRenderHint(QPainter.Antialiasing)
             painter.setClipPath(path)
             painter.drawPixmap(0, 0, scaled)
             painter.end()
+
             self.img_label.setPixmap(canvas)
+
         self.img_label.setAlignment(Qt.AlignTop)
         
         img_layout = QVBoxLayout()
         img_layout.addWidget(self.img_label)
         img_layout.addStretch()
+
         layout.addLayout(img_layout)
 
-        # 2. Info Lapangan
+        # INFO LAPANGAN
         info_layout = QVBoxLayout()
         info_layout.setSpacing(8)
 
         self.lbl_nama = QLabel(lapangan_nama)
-        self.lbl_nama.setStyleSheet("font-size: 22px; font-weight: bold; color: #111827;")
+        self.lbl_nama.setObjectName("cardTitle")
         
-        # PERBAIKAN: Menampilkan Tanggal Aktual dari Database
+        # MENAMPILKAN TANGGAL DARI DATABASE
         date_layout = QHBoxLayout()
+
         icon_date = QLabel()
         icon_date.setPixmap(create_colored_icon(os.path.join(BASE_DIR, "assets", "icons", "schedule.svg"), QColor(0,0,0), 18).pixmap(18,18))
+
         lbl_date = QLabel(tanggal_booking) 
-        lbl_date.setStyleSheet("font-weight: bold; color: #000;")
+        lbl_date.setObjectName("tggl_book")
+
         date_layout.addWidget(icon_date)
         date_layout.addWidget(lbl_date)
         date_layout.addStretch()
@@ -86,10 +90,9 @@ class HistoryCard(QFrame):
         time_layout = QHBoxLayout()
         icon_time = QLabel()
         icon_time.setPixmap(create_colored_icon(os.path.join(BASE_DIR, "assets", "icons", "time.svg"), QColor(0,0,0), 18).pixmap(18,18))
-        icon_time.setAlignment(Qt.AlignTop) 
         
         self.lbl_time = QLabel(jam_range)
-        self.lbl_time.setStyleSheet("font-weight: bold; color: #000;")
+        self.lbl_time.setObjectName("jam")
         
         time_layout.addWidget(icon_time)
         time_layout.addWidget(self.lbl_time)
@@ -98,28 +101,19 @@ class HistoryCard(QFrame):
         loc_layout = QHBoxLayout()
         icon_loc = QLabel()
         icon_loc.setPixmap(create_colored_icon(os.path.join(BASE_DIR, "assets", "icons", "location.svg"), QColor(0,0,0), 18).pixmap(18,18))
-        lbl_loc = QLabel("Mataram, Jalan xxxx")
-        lbl_loc.setStyleSheet("font-weight: bold; color: #000;")
+        lbl_loc = QLabel("Mataram, Jalan Sriwijaya")
+        lbl_loc.setObjectName("lbl")
         loc_layout.addWidget(icon_loc)
         loc_layout.addWidget(lbl_loc)
         loc_layout.addStretch()
 
         action_layout = QHBoxLayout()
-        self.btn_hapus = QPushButton(" Hapus")
+        self.btn_hapus = QPushButton("Hapus")
+        self.btn_hapus.setObjectName("btn_hps")
         self.btn_hapus.setIcon(create_colored_icon(os.path.join(BASE_DIR, "assets", "icons", "trash.svg"), QColor("#DC2626"), 16))
         self.btn_hapus.setCursor(Qt.PointingHandCursor)
-        self.btn_hapus.setStyleSheet("""
-            QPushButton {
-                color: #DC2626; 
-                font-weight: bold; 
-                font-size: 14px;
-                background: transparent; 
-                border: none; 
-                text-align: left;
-            }
-        """)
         self.btn_hapus.setFixedSize(80, 25)
-        # PERBAIKAN: Mengirim tanggal saat tombol hapus diklik
+
         self.btn_hapus.clicked.connect(lambda: self.delete_clicked.emit(lapangan_nama, tanggal_booking))
         
         action_layout.addWidget(self.btn_hapus)
@@ -136,26 +130,23 @@ class HistoryCard(QFrame):
 
 
 class HistoryPage(QWidget):
-    request_delete = Signal(str, str) # PERBAIKAN: Menangkap Lapangan dan Tanggal
+    request_delete = Signal(str, str)
 
     def __init__(self):
         super().__init__()
         self.setup_ui()
 
     def setup_ui(self):
-        self.setObjectName("homePage")
-        self.setAttribute(Qt.WA_StyledBackground, True)
-        self.setStyleSheet("#homePage { background-color: #F5F5F5; }")
-
         self.main_layout = QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
-        # --- TOP NAVBAR ---
+        # - TOP BAR
         self.top_nav = QFrame()
         self.top_nav.setObjectName("topNav")
         self.top_nav.setFixedHeight(65)
         
+        # - DROP SHADOW PADA QFRAME
         shadow_top = QGraphicsDropShadowEffect(self)
         shadow_top.setBlurRadius(15)
         shadow_top.setXOffset(0)
@@ -166,46 +157,24 @@ class HistoryPage(QWidget):
         top_layout = QHBoxLayout(self.top_nav)
         top_layout.setContentsMargins(25, 0, 25, 0)
 
-        self.btn_back = QPushButton("<")
-        self.btn_back.setObjectName("btnBack")
-        self.btn_back.setCursor(Qt.PointingHandCursor)
+        # - BAGIAN KIRI: LOGO
+        self.logo = QLabel()
+        pix_logo = QPixmap(os.path.join(BASE_DIR, "assets", "logos", "sportbook_logo.png"))
+        if not pix_logo.isNull():
+            self.logo.setPixmap(pix_logo.scaled(130, 45, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         
-        left_container = QWidget()
-        left_layout = QHBoxLayout(left_container)
-        left_layout.setContentsMargins(0, 0, 0, 0)
-        left_layout.addWidget(self.btn_back)
-        left_layout.addStretch()
-
-        self.title_top = QLabel("Riwayat Booking")
-        self.title_top.setObjectName("topTitle")
-        self.title_top.setAlignment(Qt.AlignCenter)
-
+        # - BAGIAN KANAN: NAMA PROFIL
         user_layout = QHBoxLayout()
-        user_layout.setSpacing(12)
         self.user_name = QLabel("Ravi")
         self.user_name.setObjectName("userName")
-        
-        self.icon_user = QLabel()
-        user_icon_path = os.path.join(BASE_DIR, "assets", "icons", "user.svg")
-        user_pixmap = QPixmap(user_icon_path)
-        if not user_pixmap.isNull():
-            self.icon_user.setPixmap(user_pixmap.scaled(22, 22, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        self.icon_user.setFixedSize(22, 22)
 
+        # - MEMASUKKAN KOMPONEN WIDGET
         user_layout.addWidget(self.user_name)
-        user_layout.addWidget(self.icon_user)
+        top_layout.addWidget(self.logo)
+        top_layout.addStretch()
+        top_layout.addLayout(user_layout)
 
-        right_container = QWidget()
-        right_layout = QHBoxLayout(right_container)
-        right_layout.setContentsMargins(0, 0, 0, 0)
-        right_layout.addStretch()
-        right_layout.addLayout(user_layout)
-
-        top_layout.addWidget(left_container, 1)
-        top_layout.addWidget(self.title_top, 2)
-        top_layout.addWidget(right_container, 1)
-
-        # --- SCROLL AREA ---
+        # - SCROLL AREA
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
         self.scroll.setFrameShape(QFrame.NoFrame)
@@ -221,7 +190,7 @@ class HistoryPage(QWidget):
 
         self.scroll.setWidget(self.scroll_content)
 
-        # --- BOTTOM NAVBAR ---
+        # - BOTTOM NAVBAR
         self.bot_nav = BottomNavbar(active_page="history")
 
         self.main_layout.addWidget(self.top_nav)
@@ -255,10 +224,9 @@ class HistoryPage(QWidget):
         if not bookings:
             empty_lbl = QLabel("Belum ada riwayat pemesanan.")
             empty_lbl.setAlignment(Qt.AlignCenter)
-            empty_lbl.setStyleSheet("font-size: 16px; color: #71717A; font-family: 'Segoe UI';")
+            empty_lbl.setStyleSheet("font-size: 16px; color: #71717A;")
             self.scroll_layout.addWidget(empty_lbl)
         else:
-            # PERBAIKAN: Mengelompokkan riwayat berdasarkan nama lapangan DAN tanggal
             grouped_bookings = {}
             for b in bookings:
                 lapangan_nama = b[0]

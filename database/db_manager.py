@@ -67,7 +67,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-# FUNGSI AMBIL DATA LAPANGAN (DIPAKAI OLEH USER)
+# FUNGSI AMBIL DATA LAPANGAN
 def get_all_fields():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -80,7 +80,6 @@ def get_all_fields():
 def get_all_bookings_admin():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    # Mengambil semua data tanpa filter status, sehingga data yang 'deleted' pun tetap tampil
     cursor.execute('SELECT user_nama, lapangan_nama, tanggal, jam_booking FROM bookings ORDER BY id DESC')
     rows = cursor.fetchall()
     conn.close()
@@ -130,7 +129,6 @@ def validate_login(nama, password):
     conn.close()
     return user
 
-# FUNGSI BARU UNTUK BOOKING
 def get_booked_slots(lapangan_nama, tanggal):
     """Mengambil daftar jam yang sudah dibooking untuk lapangan tertentu."""
     conn = sqlite3.connect(DB_PATH)
@@ -161,7 +159,6 @@ def save_booking(user_nama, lapangan_nama, tanggal, list_jam):
 def get_user_bookings(user_nama):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    # Menambahkan WHERE "status" = 'active'
     cursor.execute('SELECT lapangan_nama, tanggal, jam_booking FROM bookings WHERE user_nama=? AND "status" = "active" ORDER BY id DESC', (user_nama,))
     rows = cursor.fetchall()
     conn.close()

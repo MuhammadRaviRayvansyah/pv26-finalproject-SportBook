@@ -107,6 +107,7 @@ QLineEdit::placeholder {
 
 /* Background image dihapus karena sudah di-handle oleh PaintEvent pada HeroFrame */
 #heroTitle { 
+    font-weight: bold;
     color: white; 
     font-size: 28px; 
 }
@@ -114,7 +115,7 @@ QLineEdit::placeholder {
 #heroSub { 
     color: white; 
     font-size: 18px; 
-    font-weight: 600; 
+    font-weight: bold; 
 }
 
 #heroSubSmall { 
@@ -131,8 +132,6 @@ QLineEdit::placeholder {
     border-radius: 16px;
     font-size: 13px;
     font-weight: bold;
-    border: none;
-    padding: 5px 10px;
 }
 
 #locBadge:hover {
@@ -146,7 +145,6 @@ QLineEdit::placeholder {
     border-radius: 21px;
     font-weight: bold;
     font-size: 14px;
-    border: none;
 }
 
 #btnHero:hover {
@@ -180,14 +178,13 @@ QLineEdit::placeholder {
     padding: 0px;
 }
 
-/* Tombol Booking Shape 2,3,4 dengan Hover */
+/* Tombol Booking dengan Hover */
 #btnCardAction {
     background-color: #BBF7D0;
     color: #16A34A;
     border-radius: 12px;
     font-weight: bold;
     font-size: 14px;
-    border: none;
 }
 
 #btnCardAction:hover {
@@ -382,3 +379,44 @@ QToolButton {
     color: #000000;
     line-height: 1.4;
 }
+
+QFrame#historyCard {
+    background-color: white;
+    border-radius: 20px;
+}
+
+#tggl_book {
+    font-weight: bold; 
+    color: #000000;
+}
+
+#jam {
+    font-weight: bold; 
+    color: #000000;
+}
+
+#lbl {
+    font-weight: bold; 
+    color: #000000;
+}
+
+#btn_hps {
+    color: #DC2626; 
+    font-weight: bold; 
+    font-size: 14px;
+    background: transparent;
+    text-align: left;
+}
+
+#btn_keluar {
+    background-color: #EF4444; 
+    color: white; 
+    border-radius: 8px; 
+    font-size: 15px;
+    font-weight: bold; 
+}
+
+#btn_keluar:hover {
+    background-color: #DC2626;
+}
+

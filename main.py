@@ -139,7 +139,7 @@ if __name__ == "__main__":
         main_window.setWindowTitle("SportBook - Booking")
         try: booking_page.scroll.verticalScrollBar().setValue(0)
         except AttributeError: pass
-            
+
     def buka_halaman_history():
         user_aktif = current_session["nama"]
         data_history = get_user_bookings(user_aktif)
@@ -190,8 +190,7 @@ if __name__ == "__main__":
             if len(pwd) < 6:
                 QMessageBox.warning(pengaturan_page, "Peringatan", "Password minimal 6 karakter!")
                 return
-        
-        # Update ke database
+
         update_user_profile(old_nama, final_nama, pwd)
         current_session["nama"] = final_nama
         
@@ -281,33 +280,36 @@ if __name__ == "__main__":
     login_page.login_successful.connect(saat_login_berhasil)
     register_page.register_successful.connect(buka_halaman_login)
 
-    # --- PERBAIKAN NAVBAR BERANDA ---
+    # BERANDA
     home_page.bot_nav.nav_booking.connect(buka_halaman_booking)
     home_page.bot_nav.nav_history.connect(buka_halaman_history)
     home_page.bot_nav.nav_settings.connect(buka_halaman_pengaturan)
     
-    # --- PERBAIKAN NAVBAR BOOKING ---
+    # BOOKING
     booking_page.bot_nav.nav_home.connect(buka_halaman_beranda)
     booking_page.bot_nav.nav_history.connect(buka_halaman_history)
     booking_page.bot_nav.nav_settings.connect(buka_halaman_pengaturan)
-    booking_page.btn_back.clicked.connect(buka_halaman_beranda) # Tombol back atas tetap
     
-    # --- PERBAIKAN NAVBAR HISTORY ---
+    # HISTORY
     history_page.bot_nav.nav_home.connect(buka_halaman_beranda)
     history_page.bot_nav.nav_booking.connect(buka_halaman_booking)
     history_page.bot_nav.nav_settings.connect(buka_halaman_pengaturan)
-    history_page.btn_back.clicked.connect(buka_halaman_beranda) # Tombol back atas tetap
 
-    # --- PERBAIKAN NAVBAR PENGATURAN ---
+    # PENGATURAN
     pengaturan_page.bot_nav.nav_home.connect(buka_halaman_beranda)
     pengaturan_page.bot_nav.nav_booking.connect(buka_halaman_booking)
     pengaturan_page.bot_nav.nav_history.connect(buka_halaman_history)
 
-    # --- AKSI LAINNYA (Biarkan seperti semula) ---
+    # SIMPAN PENGATURAN 
     pengaturan_page.save_clicked.connect(simpan_pengaturan)
+
+    # LOGOUT PENGATURAN
     pengaturan_page.logout_clicked.connect(proses_logout)
     
+    # HAPUS CARD PADA FITUR HISTORY
     history_page.request_delete.connect(hapus_riwayat)
+
+    # BUKA DETAIL LAPANGAN
     booking_page.request_book.connect(buka_detail_lapangan)
     
     detail_page.go_back.connect(buka_halaman_booking)

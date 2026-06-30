@@ -28,6 +28,7 @@ class CardImage(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
+        super().paintEvent(event)
         painter.setRenderHint(QPainter.Antialiasing)
         if not self.pixmap.isNull():
             scaled = self.pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)

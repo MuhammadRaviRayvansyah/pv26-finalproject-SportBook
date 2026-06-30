@@ -8,7 +8,7 @@ from ui.navbar import BottomNavbar, create_colored_icon
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class PengaturanPage(QWidget):
-    save_clicked = Signal(str, str, str)  
+    save_clicked = Signal(str, str, str)
     logout_clicked = Signal()
 
     def __init__(self):
@@ -24,7 +24,7 @@ class PengaturanPage(QWidget):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
-        # --- TOP NAVBAR ---
+        # - TOP NAVBAR
         self.top_nav = QFrame()
         self.top_nav.setFixedHeight(65)
         self.top_nav.setAttribute(Qt.WA_StyledBackground, True)
@@ -45,7 +45,7 @@ class PengaturanPage(QWidget):
         self.title_top.setAlignment(Qt.AlignCenter)
         top_layout.addWidget(self.title_top)
 
-        # --- SCROLL AREA KONTEN ---
+        # - SCROLL AREA KONTEN
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
         self.scroll.setFrameShape(QFrame.NoFrame)
@@ -58,7 +58,7 @@ class PengaturanPage(QWidget):
         self.scroll_layout.setContentsMargins(25, 25, 25, 25)
         self.scroll_layout.setSpacing(20)
 
-        # --- KARTU FORMULIR (GAYA ADMIN PENGATURAN) ---
+        # - KARTU FORMULIR
         card = QFrame()
         card.setStyleSheet("""
             QFrame {
@@ -149,7 +149,7 @@ class PengaturanPage(QWidget):
         
         self.scroll_layout.addWidget(card)
 
-        # --- BUTTON KELUAR AKUN ---
+        # - BUTTON KELUAR AKUN
         self.btn_logout = QPushButton(" Keluar Akun")
         icon_logout_path = os.path.join(BASE_DIR, "assets", "icons", "logout.svg")
         self.btn_logout.setIcon(create_colored_icon(icon_logout_path, QColor(255, 255, 255), 24))
@@ -163,7 +163,6 @@ class PengaturanPage(QWidget):
                 border-radius: 8px; 
                 font-size: 15px;
                 font-weight: bold; 
-                border: none;
             }
             QPushButton:hover { background-color: #DC2626; }
         """)
@@ -181,7 +180,7 @@ class PengaturanPage(QWidget):
         self.scroll_layout.addStretch()
         self.scroll.setWidget(self.scroll_content)
 
-        # --- BOTTOM NAVBAR ---
+        # - BOTTOM NAVBAR
         self.bot_nav = BottomNavbar(active_page="pengaturan")
 
         self.main_layout.addWidget(self.top_nav)
@@ -189,23 +188,20 @@ class PengaturanPage(QWidget):
         self.main_layout.addWidget(self.bot_nav)
 
     def load_data(self, nama_sekarang):
-        # Mengisi input nama dengan nama user saat ini
         self.inp_nama.setText(nama_sekarang)
-        # Mengosongkan field password agar user tidak bingung
         self.inp_pass.clear()
         self.inp_conf_pass.clear()
 
     def on_simpan_clicked(self):
-        # Ambil nilai saat ini
         nama = self.inp_nama.text().strip()
         pwd = self.inp_pass.text().strip()
         conf_pwd = self.inp_conf_pass.text().strip()
 
-        # Jika nama kosong, kita tidak mengirimkan "" kosong ke database
-        # Kita kirimkan indikator bahwa nama tidak berubah
-        nama_final = nama if nama != "" else "KEEP_OLD_NAME"
+        if nama != "":
+            nama_final = nama
+        else:
+            nama_final = "KEEP_OLD_NAME"
 
-        # Validasi Password (hanya jika diisi)
         if pwd or conf_pwd:
             if len(pwd) < 6:
                 QMessageBox.warning(self, "Peringatan", "Password minimal 6 karakter!")
