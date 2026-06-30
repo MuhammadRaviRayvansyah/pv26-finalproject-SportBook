@@ -45,10 +45,8 @@ class CardImage(QWidget):
 
 
 class DetailBookingPage(QWidget):
-    # DITAMBAHKAN: parameter string untuk mengirim tanggal
     proceed_checkout = Signal(str, list, int, str) 
     go_back = Signal()
-    # DITAMBAHKAN: sinyal untuk meminta jam kosong saat tanggal diganti
     request_date_change = Signal(str, str) 
 
     def __init__(self):
@@ -223,9 +221,7 @@ class DetailBookingPage(QWidget):
 
         self.scroll_layout.addWidget(self.card_detail)
 
-        # =====================================================================
-        # DITAMBAHKAN: CARD TANGGAL
-        # =====================================================================
+        # CARD TANGGAL
         self.card_tanggal = QFrame()
         self.card_tanggal.setObjectName("detailCard")
         shadow_tgl = QGraphicsDropShadowEffect(self)
@@ -267,7 +263,6 @@ class DetailBookingPage(QWidget):
             }
         """)
         
-        # Isi dropdown 30 hari ke depan
         today = datetime.now()
         for i in range(30):
             date_val = today + timedelta(days=i)
@@ -278,7 +273,6 @@ class DetailBookingPage(QWidget):
         tgl_layout.addWidget(self.date_combo)
         
         self.scroll_layout.addWidget(self.card_tanggal)
-        # =====================================================================
 
         # CARD 2: Pilihan Jam
         self.card_jam = QFrame()
@@ -333,7 +327,6 @@ class DetailBookingPage(QWidget):
         self.main_layout.addWidget(self.scroll)
         self.top_nav.raise_()
 
-    # DITAMBAHKAN: Fungsi ketika dropdown tanggal diganti
     def on_date_changed(self, new_date):
         self.selected_slots.clear()
         self.lbl_durasi.setText("0 JAM")
@@ -353,14 +346,12 @@ class DetailBookingPage(QWidget):
         img_path = os.path.join(BASE_DIR, "assets", "images", img_name)
         self.img_widget.set_image(img_path)
 
-        # DITAMBAHKAN: Reset dropdown ke hari ini tanpa memicu sinyal
         self.date_combo.blockSignals(True)
         self.date_combo.setCurrentIndex(0)
         self.date_combo.blockSignals(False)
 
         self.build_time_grid(booked_slots)
 
-    # DITAMBAHKAN: Fungsi untuk me-refresh grid saat tanggal diganti
     def refresh_slots(self, booked_slots):
         self.build_time_grid(booked_slots)
 
@@ -375,6 +366,12 @@ class DetailBookingPage(QWidget):
             "16.00 - 17.00", "18.00 - 19.00", "20.00 - 21.00", "21.00 - 22.00"
         ]
 
+        # --- LOGIKA BARU MENCEGAH BOOKING JAM KADALUARSA ---
+        now = datetime.now()
+        # Jika index combo box adalah 0, berarti tanggal yang dipilih adalah hari ini
+        is_today = (self.date_combo.currentIndex() == 0)
+        current_hour = now.hour
+
         row, col = 0, 0
         for jam in waktu:
             btn = QPushButton(jam)
@@ -382,7 +379,13 @@ class DetailBookingPage(QWidget):
             btn.setFixedHeight(35)
             btn.setCursor(Qt.PointingHandCursor)
             
-            if jam in booked_slots:
+            # Ekstrak angka jam mulai (misal dari "08.00 - 09.00" kita ambil angka 8)
+            jam_mulai = int(jam.split(".")[0])
+            
+            # Cek apakah tanggalnya hari ini DAN jam dimulainya sudah lewat atau sedang berlangsung
+            is_past = is_today and (jam_mulai <= current_hour)
+            
+            if jam in booked_slots or is_past:
                 btn.setProperty("state", "booked")
                 btn.setEnabled(False) 
             else:
@@ -418,5 +421,4 @@ class DetailBookingPage(QWidget):
         total_harga = len(self.selected_slots) * self.harga_per_jam
         tanggal_terpilih = self.date_combo.currentText()
         
-        # DITAMBAHKAN: Mengirim tanggal terpilih
         self.proceed_checkout.emit(self.lapangan_nama, self.selected_slots, total_harga, tanggal_terpilih)

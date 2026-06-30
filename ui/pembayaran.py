@@ -1,7 +1,7 @@
 import os
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QFrame, QScrollArea, QGraphicsDropShadowEffect, 
-                             QRadioButton, QButtonGroup)
+                             QRadioButton, QButtonGroup, QMessageBox) # DITAMBAHKAN: QMessageBox
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QColor
 
@@ -228,10 +228,25 @@ class PembayaranPage(QWidget):
         self.lbl_total.setText(f"Rp{harga_str}")
 
     def on_bayar_clicked(self):
+        # 1. Menentukan metode pembayaran terpilih
         metode_terpilih = "GOPAY"
         if self.opt_dana.radio_btn.isChecked():
             metode_terpilih = "DANA"
         elif self.opt_ovo.radio_btn.isChecked():
             metode_terpilih = "OVO"
             
-        self.confirm_payment.emit(metode_terpilih)
+        # 2. DITAMBAHKAN: Memunculkan Dialog Konfirmasi
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle("Konfirmasi Pembayaran")
+        msg_box.setText(f"Apakah Anda yakin ingin melakukan pembayaran menggunakan {metode_terpilih}?")
+        msg_box.setIcon(QMessageBox.Question)
+        
+        btn_iya = msg_box.addButton("Iya", QMessageBox.YesRole)
+        btn_tidak = msg_box.addButton("Tidak", QMessageBox.NoRole)
+        
+        msg_box.exec()
+        
+        # 3. DITAMBAHKAN: Cek apakah pengguna mengklik tombol "Iya"
+        if msg_box.clickedButton() == btn_iya:
+            self.confirm_payment.emit(metode_terpilih)
+        # Jika klik "Tidak", fungsi otomatis selesai (return) dan tidak jadi pindah halaman.

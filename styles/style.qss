@@ -85,11 +85,11 @@ QLineEdit::placeholder {
 }
 
 /* --- Penambahan Warna Background F5F5F5 --- */
-#scrollContent {
+#scrollContent, #contentScroll{
     background-color: #F5F5F5;
 }
 
-#topNav, #botNav {
+#topNav, #botNav{
     background-color: #FFFFFF;
 }
 
